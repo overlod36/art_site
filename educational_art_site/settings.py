@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'base_app.apps.BaseAppConfig',
     'educational_app.apps.EducationalAppConfig',
     'users.apps.UsersConfig',
+    'crispy_forms',
     'informing_app.apps.InformingAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +55,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'educational_art_site.urls'
+
+LOGIN_REDIRECT_URL='/'
 
 TEMPLATES = [
     {
