@@ -1,0 +1,35 @@
+{% extends "base_app/base.html" %}
+{% block content %}
+
+<div class="content-section">
+    <div class="media-body">
+        <h2 class="account-heading">{{ profile.user.username }}</h2>
+        {% if profile_name == 'Student_Profile' %}
+            
+            <p class="text-secondary"> Студент {{ profile.last_name }} {{ profile.first_name }} </p>
+
+            <p class="text-secondary"> Группа {{ profile.group }}</p>
+
+            <div class="courses_list">
+                <ul>
+                    {% for course in courses %}
+                        <h5>{{course.title}}</h5>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        {% else %}
+            <p class="text-secondary"> Преподаватель {{ profile.last_name }} {{ profile.first_name }} </p>
+            <div class="bg-light p-5 rounded">
+                <h4>Дисциплины</h4>
+                <ul>
+                    {% for course in courses %}
+                        <h5>{{course.title}}</h5>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}
