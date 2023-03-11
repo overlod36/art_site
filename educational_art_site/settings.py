@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'base_app.apps.BaseAppConfig',
     'educational_app.apps.EducationalAppConfig',
     'users.apps.UsersConfig',
+    'informing_app.apps.InformingAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
