@@ -1,14 +1,16 @@
 {% extends "base_app/base.html" %}
 {% block content %}
 
-<hr class="featurette-divider">
+    <div class="announces">
+        <hr class="featurette-divider">
 
-{% for element in announces %}
-    <h4> {{ element.title }} </h4>
-    <p> Дисциплина: {{ element.course }} </p>
-    <p> Дата публикации: {{ element.publish_date }} </p>
-    <p> {{ element.text }} </p>
-    <hr class="featurette-divider">
-{% endfor %}
+        {% for element in announces %}
+            <h4> {{ element.title }} </h4>
+            <p> Дисциплина: {{ element.course }} </p>
+            <p> Дата публикации: {{ element.publish_date }} </p>
+            <p> {{ element.text }} </p>
+            <hr class="featurette-divider">
+        {% endfor %}
+    </div>
 
 {% endblock content %}
