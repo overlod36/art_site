@@ -9,6 +9,8 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
+from users.models import Teacher_Profile
+from django.http import HttpResponse
 
 def announces(request):
     announces = Course_Announce.objects.all()
@@ -23,5 +25,13 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('announces')
 
-    # def form_valid(self, form):
-    #     return super().form_valid(form)
+    def dispatch(self, request):
+        if not Teacher_Profile.objects.filter(user=request.user):
+            return HttpResponse(status=400)
+        else:
+            return super(CourseAnnounceCreateView, self).dispatch(request)
+
+    def form_valid(self, form):
+        # проверка (до перехода по url)
+        form.instance.author = Teacher_Profile.objects.filter(user=self.request.user).first()
+        return super().form_valid(form)

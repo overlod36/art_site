@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.urls import reverse
 
 from django.views.generic import (
@@ -16,6 +17,12 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
     model = Course
     template_name = 'educational/course_create.html'
     fields = ['title', 'groups', 'description']
+
+    def dispatch(self, request):
+        if not Teacher_Profile.objects.filter(user=request.user):
+            return HttpResponse(status=400)
+        else:
+            return super(CourseCreateView, self).dispatch(request)
 
     def form_valid(self, form):
         # проверка (до перехода по url)
