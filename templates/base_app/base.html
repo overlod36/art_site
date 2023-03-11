@@ -15,10 +15,13 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <div class="navbar-nav mr-auto">
             <a class="nav-item nav-link" href="{% url 'announces' %}">Объявления</a>
-            <a class="nav-item nav-link" href="#">Курсы</a>
           </div>
           <div class="right-nav navbar-nav">
             {% if user.is_authenticated %}
+              {% if user.groups.all.first.name == 'Teachers' %}
+                <a class="nav-item nav-link" href="{% url 'course-create'%}">Добавить курс</a>
+                <a class="nav-item nav-link" href="{% url 'ann-create'%}">Добавить объявление</a>
+              {% endif %}
               <a class="nav-item nav-link" href="{% url 'profile'%}">Профиль</a>
               <a class="nav-item nav-link" href="{% url 'logout' %}">Выход</a>
             {% else %}

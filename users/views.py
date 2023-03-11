@@ -6,12 +6,12 @@ from educational_app.models import Course
 @login_required(login_url='/login/')
 def profile(request):
     # декоратор на проверку наличия профиля
-    if Student_Profile.objects.filter(user=request.user):
+    if request.user.groups.all().first().name == 'Students':
         profile = Student_Profile.objects.filter(user=request.user).first()
         context = { 'profile' : profile , 
                    'courses': Course.objects.filter(groups = Student_Profile.objects.filter(user=request.user).first().group),
                    'profile_name': profile._meta.object_name }
-    elif Teacher_Profile.objects.filter(user=request.user):
+    elif request.user.groups.all().first().name == 'Teachers':
         profile = Teacher_Profile.objects.filter(user=request.user).first()
         context = { 'profile': profile ,
                    'courses': Course.objects.filter(author = Teacher_Profile.objects.filter(user=request.user).first()),

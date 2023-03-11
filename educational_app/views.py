@@ -19,7 +19,9 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
     fields = ['title', 'groups', 'description']
 
     def dispatch(self, request):
-        if not Teacher_Profile.objects.filter(user=request.user):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not request.user.groups.all().first().name == 'Teachers':
             return HttpResponse(status=400)
         else:
             return super(CourseCreateView, self).dispatch(request)
