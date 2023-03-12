@@ -8,4 +8,4 @@ class Course(models.Model):
     description = models.TextField(verbose_name='Описание курса')
 
     def __str__(self):
-        return f"Курс '{self.title}', преподаватель - {self.author}"
+        return f"Курс: {self.title}, преподаватель: {self.author}"
