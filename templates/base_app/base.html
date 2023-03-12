@@ -22,7 +22,7 @@
                 <a class="nav-item nav-link" href="{% url 'course-create'%}">Добавить курс</a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}">Добавить объявление</a>
               {% endif %}
-              <a class="nav-item nav-link" href="{% url 'profile'%}">Профиль</a>
+              <a class="nav-item nav-link" href="{% url 'profile'%}"><img class="profile-ico" src="{% static 'img/user.png' %}" style="margin-right: 0.5rem; margin-bottom: 0.1rem" alt="">{{ user.username }}</a>
               <a class="nav-item nav-link" href="{% url 'logout' %}">Выход</a>
             {% else %}
               <a class="nav-item nav-link" href="{% url 'login' %}">Вход</a>
