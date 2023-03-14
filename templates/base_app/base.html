@@ -19,8 +19,8 @@
           </div>
           <div class="right-nav navbar-nav">
             {% if user.is_authenticated %}
-              {% check_teacher_profile user as check %}
-              {% if check %}
+              {% define_profile user as check %}
+              {% if check == 'teacher' %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
               {% endif %}

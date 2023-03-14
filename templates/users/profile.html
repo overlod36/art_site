@@ -1,10 +1,12 @@
 {% extends "base_app/base.html" %}
+{% load check_user %}
 {% block content %}
 
 <div class="content-section">
     <div class="media-body">
         <h2 class="account-heading">{{ profile.user.username }}</h2>
-        {% if profile_name == 'Student_Profile' %}
+        {% define_profile user as profile_ch %}
+        {% if profile_ch == 'student' %}
             
             <p class="text-secondary"> Студент {{ profile.last_name }} {{ profile.first_name }} </p>
 
@@ -18,7 +20,7 @@
                 </ul>
             </div>
 
-        {% elif profile_name == 'Teacher_Profile' %}
+        {% elif profile_ch == 'teacher' %}
             <p class="text-secondary"> Преподаватель {{ profile.last_name }} {{ profile.first_name }} </p>
             <div class="bg-light p-5 rounded">
                 <h4>Дисциплины</h4>
@@ -28,8 +30,8 @@
                     {% endfor %}
                 </ul>
             </div>
-        {% elif profile_name == 'Admin_Profile' %}
-        <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
+        {% elif profile_ch == 'admin' %}
+            <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
         {% endif %}
     </div>
 </div>

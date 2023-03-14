@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 register = template.Library()
 
 @register.simple_tag
-def check_teacher_profile(user: User):
-    if hasattr(user, 'teacher_profile'): return True
-    return False
+def define_profile(user: User):
+    if hasattr(user, 'teacher_profile'): return 'teacher'
+    elif hasattr(user, 'student_profile'): return 'student'
+    elif hasattr(user, 'admin_profile'): return 'admin'

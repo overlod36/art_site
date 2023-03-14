@@ -10,15 +10,13 @@ def profile(request):
     if hasattr(request.user, 'student_profile'):
         profile = Student_Profile.objects.filter(user=request.user).first()
         context = { 'profile' : profile , 
-                   'courses': Course.objects.filter(groups = Student_Profile.objects.filter(user=request.user).first().group),
-                   'profile_name': profile._meta.object_name }
+                   'courses': Course.objects.filter(groups = Student_Profile.objects.filter(user=request.user).first().group) }
     elif hasattr(request.user, 'teacher_profile'):
         profile = Teacher_Profile.objects.filter(user=request.user).first()
         context = { 'profile': profile ,
-                   'courses': Course.objects.filter(author = Teacher_Profile.objects.filter(user=request.user).first()),
-                   'profile_name': profile._meta.object_name }
+                   'courses': Course.objects.filter(author = Teacher_Profile.objects.filter(user=request.user).first())}
     elif hasattr(request.user, 'admin_profile'):
         profile = Admin_Profile.objects.filter(user=request.user).first()
-        context = { 'profile': profile, 'profile_name': profile._meta.object_name }
+        context = { 'profile': profile }
     return render(request, 'users/profile.html', context)
 
