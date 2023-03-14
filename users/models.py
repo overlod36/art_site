@@ -9,8 +9,8 @@ class Study_Group(models.Model):
 
 class Base_Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=20, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
     sur_name = models.CharField(max_length=30, blank=True)
 
     class Meta:
@@ -25,3 +25,7 @@ class Student_Profile(Base_Profile):
 
     def __str__(self):
         return f'Студент {self.last_name} {self.first_name}'
+
+class Admin_Profile(Base_Profile):
+    def __str__(self):
+        return f'Администратор {self.user.username}'

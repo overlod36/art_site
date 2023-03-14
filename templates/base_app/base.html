@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    {% load static %}  
+    {% load static %} 
+    {% load check_user %}
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" >
     <link rel="stylesheet" type="text/css" href="{% static 'css/base/style.css' %}"> 
   </head>
@@ -18,7 +19,8 @@
           </div>
           <div class="right-nav navbar-nav">
             {% if user.is_authenticated %}
-              {% if user.groups.all.first.name == 'Teachers' %}
+              {% check_teacher_profile user as check %}
+              {% if check %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
               {% endif %}

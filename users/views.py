@@ -1,22 +1,24 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Student_Profile, Teacher_Profile
+from .models import Student_Profile, Teacher_Profile, Admin_Profile
 from educational_app.models import Course
+from .decorators import check_profile_activation
 
 @login_required(login_url='/login/')
+@check_profile_activation
 def profile(request):
-    # декоратор на проверку наличия профиля
-    if request.user.groups.all().first().name == 'Students':
+    if hasattr(request.user, 'student_profile'):
         profile = Student_Profile.objects.filter(user=request.user).first()
         context = { 'profile' : profile , 
                    'courses': Course.objects.filter(groups = Student_Profile.objects.filter(user=request.user).first().group),
                    'profile_name': profile._meta.object_name }
-    elif request.user.groups.all().first().name == 'Teachers':
+    elif hasattr(request.user, 'teacher_profile'):
         profile = Teacher_Profile.objects.filter(user=request.user).first()
         context = { 'profile': profile ,
                    'courses': Course.objects.filter(author = Teacher_Profile.objects.filter(user=request.user).first()),
                    'profile_name': profile._meta.object_name }
-    else:
-        pass
+    elif hasattr(request.user, 'admin_profile'):
+        profile = Admin_Profile.objects.filter(user=request.user).first()
+        context = { 'profile': profile, 'profile_name': profile._meta.object_name }
     return render(request, 'users/profile.html', context)
 

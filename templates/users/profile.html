@@ -18,7 +18,7 @@
                 </ul>
             </div>
 
-        {% else %}
+        {% elif profile_name == 'Teacher_Profile' %}
             <p class="text-secondary"> Преподаватель {{ profile.last_name }} {{ profile.first_name }} </p>
             <div class="bg-light p-5 rounded">
                 <h4>Дисциплины</h4>
@@ -28,6 +28,8 @@
                     {% endfor %}
                 </ul>
             </div>
+        {% elif profile_name == 'Admin_Profile' %}
+        <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
         {% endif %}
     </div>
 </div>

@@ -1,0 +1,15 @@
+{% extends 'base_app/base.html' %}
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="text-center">
+            <h1 class="display-1 fw-bold">404</h1>
+            <p class="fs-3"> <span class="text-danger">Ошибка!</span></p>
+            <p class="lead">
+                Ваша учетная запись не активирована!
+            </p>
+            <a href="{% url 'main' %}" class="btn btn-primary">Вернуться на главную страницу</a>
+        </div>
+    </div>
+
+{% endblock content %}
