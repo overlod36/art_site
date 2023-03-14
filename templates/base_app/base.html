@@ -23,6 +23,8 @@
               {% if check == 'teacher' %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
+              {% elif check == 'admin' %}
+                <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
               {% endif %}
               <a class="nav-item nav-link" href="{% url 'profile'%}"><img class="use-ico" src="{% static 'img/user.png' %}" alt="">{{ user.username }}</a>
               <a class="nav-item nav-link" href="{% url 'logout' %}">Выход</a>

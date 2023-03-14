@@ -1,13 +1,13 @@
 {% extends "base_app/base.html" %}
+{% load date_filter %}
 {% block content %}
 
     <div class="announces">
         <hr class="featurette-divider">
-
         {% for element in announces %}
             <h4> {{ element.title }} </h4>
             <p> {{ element.course }} </p>
-            <p> Дата публикации: {{ element.publish_date }} </p>
+            <p> Дата публикации: {{ element.publish_date|format }} </p>
             <p> {{ element.text }} </p>
             <hr class="featurette-divider">
         {% endfor %}
