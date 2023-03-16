@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Student_Profile, Teacher_Profile, Admin_Profile
 from educational_app.models import Course
 from .decorators import check_profile_activation
 
@@ -8,12 +7,12 @@ from .decorators import check_profile_activation
 @check_profile_activation
 def profile(request):
     if hasattr(request.user, 'student_profile'):
-        context = { 'profile' : Student_Profile.objects.filter(user=request.user).first() , 
-                   'courses': Course.objects.filter(groups = Student_Profile.objects.filter(user=request.user).first().group) }
+        context = { 'profile' : request.user.student_profile , 
+                   'courses': Course.objects.filter(groups = request.user.student_profile.group) }
     elif hasattr(request.user, 'teacher_profile'):
-        context = { 'profile': Teacher_Profile.objects.filter(user=request.user).first() ,
-                   'courses': Course.objects.filter(author = Teacher_Profile.objects.filter(user=request.user).first())}
+        context = { 'profile': request.user.teacher_profile ,
+                   'courses': Course.objects.filter(author = request.user.teacher_profile)}
     elif hasattr(request.user, 'admin_profile'):
-        context = { 'profile': Admin_Profile.objects.filter(user=request.user).first() }
+        context = { 'profile': request.user.admin_profile }
     return render(request, 'users/profile.html', context)
 

@@ -21,10 +21,10 @@ from users.decorators import check_profile_activation
 @check_profile_activation
 def announces(request):
     if hasattr(request.user, 'student_profile'):
-        group = Student_Profile.objects.filter(user=request.user).first().group
+        group = request.user.student_profile.group
         context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(groups=group).all()).order_by('-publish_date') }
     elif hasattr(request.user, 'teacher_profile'):
-        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(author=Teacher_Profile.objects.filter(user=request.user).first()).all()).order_by('-publish_date') }
+        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(author=request.user.teacher_profile).all()).order_by('-publish_date') }
     elif hasattr(request.user, 'admin_profile'):
         announces = Course_Announce.objects.all().order_by('-publish_date')
         context = { 'announces': announces }
@@ -40,7 +40,7 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
     def dispatch(self, request):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
-        if not request.user.groups.all().first().name == 'Teachers':
+        if not hasattr(request.user, 'teacher_profile'):
             return HttpResponse(status=400)
         else:
             return super(CourseAnnounceCreateView, self).dispatch(request)
@@ -51,6 +51,5 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        # проверка (до перехода по url)
-        form.instance.author = Teacher_Profile.objects.filter(user=self.request.user).first()
+        form.instance.author = self.request.user.teacher_profile
         return super().form_valid(form)

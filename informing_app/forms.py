@@ -11,4 +11,4 @@ class ClassAnnounceForm(ModelForm):
     def __init__(self, *args, **kwargs):
         to_user = kwargs.pop('user')
         super(ClassAnnounceForm, self).__init__(*args, **kwargs)
-        self.fields['course'].queryset = Course.objects.filter(author=Teacher_Profile.objects.filter(user=to_user).first()).all()
+        self.fields['course'].queryset = Course.objects.filter(author=to_user.teacher_profile).all()
