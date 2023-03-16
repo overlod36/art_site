@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse
 from . models import Course_Announce
+from educational_app.models import Course
+from users.models import Student_Profile, Admin_Profile, Teacher_Profile
 from .forms import ClassAnnounceForm
 from django.views.generic import (
     ListView,
@@ -12,10 +14,21 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from users.decorators import check_profile_activation
 
+@login_required(login_url='/login/')
+@check_profile_activation
 def announces(request):
-    announces = Course_Announce.objects.all()
-    context = { 'announces': announces }
+    if hasattr(request.user, 'student_profile'):
+        group = Student_Profile.objects.filter(user=request.user).first().group
+        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(groups=group).all()) }
+    elif hasattr(request.user, 'teacher_profile'):
+        announces = Course_Announce.objects.all()
+        context = { 'announces': announces }
+    elif hasattr(request.user, 'admin_profile'):
+        announces = Course_Announce.objects.all()
+        context = { 'announces': announces }
     return render(request, 'informing/announces.html', context)
 
 class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):

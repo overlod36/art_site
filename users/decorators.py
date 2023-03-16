@@ -7,3 +7,10 @@ def check_profile_activation(view_function):
         else:
             return render(request, 'base_app/error.html', {'error': 'Ваша учетная запись не активирована!'})
     return wrapper_function
+
+# def user_access(accessed_roles=[]):
+#     def decorator(view_func):
+#         def wrapper_func(request, *args, **kwargs):
+#             return view_func(request, *args, **kwargs)
+#         return wrapper_func
+#     return decorator
