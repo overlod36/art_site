@@ -22,12 +22,11 @@ from users.decorators import check_profile_activation
 def announces(request):
     if hasattr(request.user, 'student_profile'):
         group = Student_Profile.objects.filter(user=request.user).first().group
-        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(groups=group).all()) }
+        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(groups=group).all()).order_by('-publish_date') }
     elif hasattr(request.user, 'teacher_profile'):
-        announces = Course_Announce.objects.all()
-        context = { 'announces': announces }
+        context = { 'announces': Course_Announce.objects.filter(course__in=Course.objects.filter(author=Teacher_Profile.objects.filter(user=request.user).first()).all()).order_by('-publish_date') }
     elif hasattr(request.user, 'admin_profile'):
-        announces = Course_Announce.objects.all()
+        announces = Course_Announce.objects.all().order_by('-publish_date')
         context = { 'announces': announces }
     return render(request, 'informing/announces.html', context)
 
