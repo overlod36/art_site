@@ -1,0 +1,10 @@
+{% extends "base_app/base.html" %}
+{% block content %}
+
+    <div class="course">
+        <h2> {{ course.title }} </h2>
+        <p> {{ course.author }} </p>
+        <p> Описание курса: {{ course.description }} </p>
+    </div>
+
+{% endblock content %}

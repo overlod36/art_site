@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse
 from . models import Course_Announce
+from .forms import ClassAnnounceForm
 from django.views.generic import (
     ListView,
     DetailView,
@@ -18,9 +19,8 @@ def announces(request):
     return render(request, 'informing/announces.html', context)
 
 class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
-    model = Course_Announce
+    form_class = ClassAnnounceForm
     template_name = 'informing/announce_create.html'
-    fields = ['title', 'text', 'course']
 
     def get_success_url(self):
         return reverse('announces')
@@ -32,6 +32,11 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
             return HttpResponse(status=400)
         else:
             return super(CourseAnnounceCreateView, self).dispatch(request)
+
+    def get_form_kwargs(self):
+        kwargs = super(CourseAnnounceCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
     def form_valid(self, form):
         # проверка (до перехода по url)

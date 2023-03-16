@@ -33,3 +33,9 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('main')
+
+def get_course(request, id):
+    if Course.objects.filter(pk=id):
+        return render(request, 'educational/course.html', {'course': Course.objects.filter(pk=id).first()})
+    else: return render(request, 'base_app/error.html', {'error': 'Такого курса нет!'})
+

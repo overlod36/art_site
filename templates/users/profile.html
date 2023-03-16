@@ -1,5 +1,6 @@
 {% extends "base_app/base.html" %}
 {% load check_user %}
+{% load static %}
 {% block content %}
 
 <div class="content-section">
@@ -13,25 +14,30 @@
             <p class="text-secondary"> Группа {{ profile.group }}</p>
 
             <div class="courses_list">
-                <ul>
+                <div class="list-group">
                     {% for course in courses %}
-                        <h5>{{course.title}}</h5>
+                        <a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
 
         {% elif profile_ch == 'teacher' %}
             <p class="text-secondary"> Преподаватель {{ profile.last_name }} {{ profile.first_name }} </p>
             <div class="bg-light p-5 rounded">
                 <h4>Дисциплины</h4>
-                <ul>
+                <div class="list-group">
                     {% for course in courses %}
-                        <h5>{{course.title}}</h5>
+                        <a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
         {% elif profile_ch == 'admin' %}
             <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
+            <div class="list-group">
+                <a class="text-decoration-none link-secondary" href="#"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
+                <a class="text-decoration-none link-secondary" href="#"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
+            </div>
+            
         {% endif %}
     </div>
 </div>
