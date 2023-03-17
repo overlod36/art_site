@@ -12,7 +12,7 @@ from django.views.generic import (
 from .models import Course
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile
-from .decorators import check_course_existence
+from .decorators import check_course_existence, course_access
 
 class CourseCreateView(LoginRequiredMixin, CreateView):
     model = Course
@@ -37,6 +37,7 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
 
 @login_required(login_url='/login/')
 @check_course_existence
+@course_access
 def get_course(request, id):
     return render(request, 'educational/course.html', {'course': Course.objects.filter(pk=id).first()})
 
