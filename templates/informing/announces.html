@@ -6,7 +6,8 @@
         <hr class="featurette-divider">
         {% for element in announces %}
             <h4> {{ element.title }} </h4>
-            <p> {{ element.course }} </p>
+            <p> Автор объявления: {{ element.course.author }} </p>
+            <p> Дисциплина: {{ element.course.title }}</p>
             <p> Дата публикации: {{ element.publish_date|format }} </p>
             <p> {{ element.text }} </p>
             <hr class="featurette-divider">

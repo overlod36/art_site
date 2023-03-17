@@ -35,7 +35,13 @@
             <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
             <div class="list-group">
                 <a class="text-decoration-none link-secondary" href="#"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
-                <a class="text-decoration-none link-secondary" href="#"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
+                <div class="dropend">
+                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset">
+                        <li><a class="dropdown-item">Добавление студента</a></li>
+                        <li><a class="dropdown-item">Добавление преподавателя</a></li>
+                    </ul>
+                </div>
             </div>
             
         {% endif %}
