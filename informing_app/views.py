@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from . models import Course_Announce
 from educational_app.models import Course
-from users.models import Student_Profile, Admin_Profile, Teacher_Profile
 from .forms import ClassAnnounceForm
 from django.views.generic import (
     ListView,
@@ -12,7 +11,6 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
-from users.models import Teacher_Profile
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from users.decorators import check_profile_activation

@@ -9,9 +9,9 @@ class Study_Group(models.Model):
 
 class Base_Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    sur_name = models.CharField(max_length=30, blank=True)
+    first_name = models.CharField(verbose_name= 'Имя', max_length=20, blank=True)
+    last_name = models.CharField(verbose_name= 'Фамилия', max_length=30, blank=True)
+    sur_name = models.CharField(verbose_name="Отчество",max_length=30, blank=True)
 
     class Meta:
         abstract = True
@@ -21,7 +21,7 @@ class Teacher_Profile(Base_Profile):
         return f'Преподаватель {self.last_name} {self.first_name}'
 
 class Student_Profile(Base_Profile):
-    group = models.ForeignKey(Study_Group, null=True, on_delete=models.SET_NULL) # вопрос, как быть с удалением групп и переопределением
+    group = models.ForeignKey(Study_Group, verbose_name= 'Группа', null=True, on_delete=models.SET_NULL) # вопрос, как быть с удалением групп и переопределением
 
     def __str__(self):
         return f'Студент {self.last_name} {self.first_name}'
