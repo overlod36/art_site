@@ -11,6 +11,7 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentForm, TeacherForm, AdminForm
+from django.http import HttpResponse
 from django.urls import reverse
 
 @login_required(login_url='/login/')
@@ -33,6 +34,14 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('main')
 
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(StudentCreateView, self).dispatch(request)
+
     def form_valid(self, form):
         user = form['user'].save()
         profile = form['student'].save(commit=False)
@@ -46,6 +55,14 @@ class TeacherCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('main')
+    
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(StudentCreateView, self).dispatch(request)
 
     def form_valid(self, form):
         user = form['user'].save()
@@ -60,6 +77,14 @@ class AdminCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('main')
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(StudentCreateView, self).dispatch(request)
 
     def form_valid(self, form):
         user = form['user'].save()
