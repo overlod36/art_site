@@ -10,7 +10,7 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import StudentForm
+from .forms import StudentForm, TeacherForm, AdminForm
 from django.urls import reverse
 
 @login_required(login_url='/login/')
@@ -31,11 +31,41 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'users/student_create.html'
 
     def get_success_url(self):
-        return reverse('announces')
+        return reverse('main')
 
     def form_valid(self, form):
         user = form['user'].save()
         profile = form['student'].save(commit=False)
+        profile.user = user
+        profile.save()
+        return redirect(self.get_success_url())
+
+class TeacherCreateView(LoginRequiredMixin, CreateView):
+    form_class = TeacherForm
+    template_name = 'users/teacher_create.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def form_valid(self, form):
+        user = form['user'].save()
+        profile = form['teacher'].save(commit=False)
+        profile.user = user
+        profile.save()
+        return redirect(self.get_success_url())
+
+class AdminCreateView(LoginRequiredMixin, CreateView):
+    form_class = AdminForm
+    template_name = 'users/admin_create.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def form_valid(self, form):
+        user = form['user'].save()
+        user.is_staff = True
+        user.save()
+        profile = form['admin'].save(commit=False)
         profile.user = user
         profile.save()
         return redirect(self.get_success_url())

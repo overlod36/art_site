@@ -14,13 +14,15 @@ class StudentProfileForm(forms.ModelForm):
         model = Student_Profile
         fields = ['first_name', 'last_name', 'sur_name', 'group']
 
-# class TeacherProfileForm(forms.ModelForm):
-#     class Meta:
-#         model = Teacher_Profile
+class TeacherProfileForm(forms.ModelForm):
+    class Meta:
+        model = Teacher_Profile
+        fields = ['first_name', 'last_name', 'sur_name']
 
-# class AdminProfileForm(forms.ModelForm):
-#     class Meta:
-#         model = Admin_Profile
+class AdminProfileForm(forms.ModelForm):
+    class Meta:
+        model = Admin_Profile
+        fields = ['first_name', 'last_name', 'sur_name']
 
 class StudentForm(MultiModelForm):
     form_classes = {
@@ -28,14 +30,14 @@ class StudentForm(MultiModelForm):
         'student': StudentProfileForm
     }
 
-# class TeacherForm(MultiModelForm):
-#     form_classes = {
-#         'user': UserForm,
-#         'teacher': TeacherProfileForm
-#     }
+class TeacherForm(MultiModelForm):
+    form_classes = {
+        'user': UserForm,
+        'teacher': TeacherProfileForm
+    }
 
-# class AdminForm(MultiModelForm):
-#     form_classes = {
-#         'user': UserForm,
-#         'admin': AdminProfileForm
-#     }
+class AdminForm(MultiModelForm):
+    form_classes = {
+        'user': UserForm,
+        'admin': AdminProfileForm
+    }
