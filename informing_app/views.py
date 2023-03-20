@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from . models import Course_Announce
 from educational_app.models import Course
@@ -27,6 +27,14 @@ def announces(request):
         announces = Course_Announce.objects.all().order_by('-publish_date')
         context = { 'announces': announces }
     return render(request, 'informing/announces.html', context)
+
+def delete_announce(request, id):
+    announce = Course_Announce.objects.filter(pk=id).first()
+    if request.method == 'POST':
+        announce.delete()
+        return redirect('main')
+    context = { 'item': announce , 'name': 'объявление' }
+    return render(request, 'informing/announce_delete.html', context)
 
 class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
     form_class = ClassAnnounceForm

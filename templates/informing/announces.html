@@ -1,4 +1,6 @@
 {% extends "base_app/base.html" %}
+{% load check_user %}
+{% load static %}
 {% load date_filter %}
 {% block content %}
 
@@ -10,6 +12,10 @@
             <p> Дисциплина: {{ element.course.title }}</p>
             <p> Дата публикации: {{ element.publish_date|format }} </p>
             <p> {{ element.text }} </p>
+            {% define_profile user as profile_ch %}
+            {% if profile_ch == 'teacher' %}
+                <a href="{% url 'delete-announce' id=element.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            {% endif %}
             <hr class="featurette-divider">
         {% endfor %}
     </div>

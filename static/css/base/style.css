@@ -12,6 +12,10 @@
     margin-right: 0.5rem; margin-bottom: 0.1rem;
 }
 
+.danger-ico{
+    margin-right: 0.5rem; margin-bottom: 0.3rem;
+}
+
 .logo{
     margin-bottom: 0.3rem;
 }
@@ -22,4 +26,13 @@
 
 .list-group a{
     margin-bottom: 0.5em;
+}
+
+.trash{
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 17px;
+    border-radius: 8px;
+    font-size: 17px;
 }
