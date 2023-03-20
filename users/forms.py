@@ -1,7 +1,12 @@
 from django import forms
-from .models import Teacher_Profile, Student_Profile, Admin_Profile
+from .models import Teacher_Profile, Student_Profile, Admin_Profile, Study_Group
 from django.contrib.auth.models import User
 from betterforms.multiform import MultiModelForm
+
+class StudyGroupForm(forms.ModelForm):
+    class Meta:
+        model = Study_Group
+        fields = ['number']
 
 class UserForm(forms.ModelForm):
     class Meta:

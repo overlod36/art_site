@@ -9,5 +9,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('student/new', views.StudentCreateView.as_view(), name='student-create'),
     path('teacher/new', views.TeacherCreateView.as_view(), name='teacher-create'),
-    path('administrator/new', views.AdminCreateView.as_view(), name='admin-create')
+    path('administrator/new', views.AdminCreateView.as_view(), name='admin-create'),
+    path('group/new', views.StudyGroupCreateView.as_view(), name='group-create')
 ]

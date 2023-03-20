@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Study_Group(models.Model):
-    number = models.PositiveIntegerField(unique=True)
+    number = models.PositiveIntegerField(verbose_name='Номер группы', unique=True)
 
     def __str__(self):
         return f'Группа {self.number}'

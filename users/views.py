@@ -10,7 +10,7 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import StudentForm, TeacherForm, AdminForm
+from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm
 from django.http import HttpResponse
 from django.urls import reverse
 
@@ -93,5 +93,24 @@ class AdminCreateView(LoginRequiredMixin, CreateView):
         profile = form['admin'].save(commit=False)
         profile.user = user
         profile.save()
+        return redirect(self.get_success_url())
+
+class StudyGroupCreateView(LoginRequiredMixin, CreateView):
+    form_class = StudyGroupForm
+    template_name = 'users/group_create.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(StudyGroupCreateView, self).dispatch(request)
+    
+    def form_valid(self, form):
+        form.save()
         return redirect(self.get_success_url())
 
