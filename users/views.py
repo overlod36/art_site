@@ -62,7 +62,7 @@ class TeacherCreateView(LoginRequiredMixin, CreateView):
         if not hasattr(request.user, 'admin_profile'):
             return HttpResponse(status=400)
         else:
-            return super(StudentCreateView, self).dispatch(request)
+            return super(TeacherCreateView, self).dispatch(request)
 
     def form_valid(self, form):
         user = form['user'].save()
@@ -84,7 +84,7 @@ class AdminCreateView(LoginRequiredMixin, CreateView):
         if not hasattr(request.user, 'admin_profile'):
             return HttpResponse(status=400)
         else:
-            return super(StudentCreateView, self).dispatch(request)
+            return super(AdminCreateView, self).dispatch(request)
 
     def form_valid(self, form):
         user = form['user'].save()
