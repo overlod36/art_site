@@ -2,7 +2,7 @@
 {% block content %}
 
 <p>Вы действительно хотите удалить {{name}}?</p>
-<form action="{% url 'delete-student' item.pk %}" method="POST">
+<form action="" method="POST">
     {% csrf_token %}
     <a href="{% url 'students' %}">Отмена</a>
     <input type="submit" name="Confirm" value="Подтвердить">

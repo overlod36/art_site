@@ -15,6 +15,7 @@ from .models import Student_Profile
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 
 @login_required(login_url='/login/')
 @check_profile_activation
@@ -29,18 +30,54 @@ def profile(request):
         context = { 'profile': request.user.admin_profile }
     return render(request, 'users/profile.html', context)
 
-def delete_student(request, id):
-    student = User.objects.get(pk=id)
-    if request.method == 'POST':
-        student.delete()
-        return redirect('main')
-    context = {'item': student, 'name': 'студента'}
-    return render(request, 'users/student_delete.html' ,context)
+class TeacherCreateView(LoginRequiredMixin, CreateView):
+    form_class = TeacherForm
+    template_name = 'users/teacher_create.html'
 
-def update_student(request, id):
-    student = User.objects.get(pk=id)
-    context = {'item': student, 'name': 'студента'}
-    return render(request, 'users/student_update.html', context)
+    def get_success_url(self):
+        return reverse('main')
+    
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(TeacherCreateView, self).dispatch(request)
+
+    def form_valid(self, form):
+        user = form['user'].save(commit=False)
+        user.password = make_password(form['user']['password'].value())
+        user.save()
+        profile = form['teacher'].save(commit=False)
+        profile.user = user
+        profile.save()
+        return redirect(self.get_success_url())
+
+class AdminCreateView(LoginRequiredMixin, CreateView):
+    form_class = AdminForm
+    template_name = 'users/admin_create.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(AdminCreateView, self).dispatch(request)
+
+    def form_valid(self, form):
+        user = form['user'].save(commit=False)
+        user.is_staff = True
+        user.password = make_password(form['user']['password'].value())
+        user.save()
+        profile = form['admin'].save(commit=False)
+        profile.user = user
+        profile.save()
+        return redirect(self.get_success_url())
 
 class StudentsListView(LoginRequiredMixin, ListView):
     model = User
@@ -86,57 +123,20 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
             return super(StudentCreateView, self).dispatch(request)
 
     def form_valid(self, form):
-        user = form['user'].save()
+        user = form['user'].save(commit=False)
+        user.password = make_password(form['user']['password'].value())
+        user.save()
         profile = form['student'].save(commit=False)
         profile.user = user
         profile.save()
         return redirect(self.get_success_url())
 
-class TeacherCreateView(LoginRequiredMixin, CreateView):
-    form_class = TeacherForm
-    template_name = 'users/teacher_create.html'
+class StudentDeleteView(LoginRequiredMixin, DeleteView):
+    model = User
+    template_name = 'users/student_delete.html'
 
     def get_success_url(self):
         return reverse('main')
-    
-    def dispatch(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=400)
-        if not hasattr(request.user, 'admin_profile'):
-            return HttpResponse(status=400)
-        else:
-            return super(TeacherCreateView, self).dispatch(request)
-
-    def form_valid(self, form):
-        user = form['user'].save()
-        profile = form['teacher'].save(commit=False)
-        profile.user = user
-        profile.save()
-        return redirect(self.get_success_url())
-
-class AdminCreateView(LoginRequiredMixin, CreateView):
-    form_class = AdminForm
-    template_name = 'users/admin_create.html'
-
-    def get_success_url(self):
-        return reverse('main')
-
-    def dispatch(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=400)
-        if not hasattr(request.user, 'admin_profile'):
-            return HttpResponse(status=400)
-        else:
-            return super(AdminCreateView, self).dispatch(request)
-
-    def form_valid(self, form):
-        user = form['user'].save()
-        user.is_staff = True
-        user.save()
-        profile = form['admin'].save(commit=False)
-        profile.user = user
-        profile.save()
-        return redirect(self.get_success_url())
 
 class StudyGroupCreateView(LoginRequiredMixin, CreateView):
     form_class = StudyGroupForm

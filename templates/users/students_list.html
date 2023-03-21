@@ -10,7 +10,7 @@
             <br/>
             <em> {{ student.student_profile.group }} </em>
             <p></p>
-            <a href="{% url 'delete-student' id=student.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            <a href="{% url 'delete-student' student.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
             <a href="{% url 'update-student' student.student_profile.pk %}"><button class="edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
             <hr class="featurette-divider">
         {% endfor %}
