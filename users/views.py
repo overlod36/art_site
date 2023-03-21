@@ -11,8 +11,10 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm
+from .models import Student_Profile
 from django.http import HttpResponse
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 @login_required(login_url='/login/')
 @check_profile_activation
@@ -26,6 +28,47 @@ def profile(request):
     elif hasattr(request.user, 'admin_profile'):
         context = { 'profile': request.user.admin_profile }
     return render(request, 'users/profile.html', context)
+
+def delete_student(request, id):
+    student = User.objects.get(pk=id)
+    if request.method == 'POST':
+        student.delete()
+        return redirect('main')
+    context = {'item': student, 'name': 'студента'}
+    return render(request, 'users/student_delete.html' ,context)
+
+def update_student(request, id):
+    student = User.objects.get(pk=id)
+    context = {'item': student, 'name': 'студента'}
+    return render(request, 'users/student_update.html', context)
+
+class StudentsListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = 'users/students_list.html'
+    context_object_name = 'students'
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(StudentsListView, self).dispatch(request)
+
+    def get_queryset(self):
+        return User.objects.filter(student_profile__id__isnull=False)
+
+class StudentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Student_Profile
+    template_name = 'users/student_update.html'
+    fields = ['first_name', 'last_name', 'sur_name', 'group']
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
 
 class StudentCreateView(LoginRequiredMixin, CreateView):
     form_class = StudentForm

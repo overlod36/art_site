@@ -29,7 +29,7 @@ def announces(request):
     return render(request, 'informing/announces.html', context)
 
 def delete_announce(request, id):
-    announce = Course_Announce.objects.filter(pk=id).first()
+    announce = Course_Announce.objects.get(pk=id)
     if request.method == 'POST':
         announce.delete()
         return redirect('main')

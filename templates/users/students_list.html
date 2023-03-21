@@ -1,0 +1,19 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+
+    <div class="students">
+        <hr class="featurette-divider">
+        {% for student in students %}
+            <p> Студент {{ student.student_profile.last_name }} {{ student.student_profile.first_name }}</p>
+            <em> Логин: {{ student.username }} </em>
+            <br/>
+            <em> {{ student.student_profile.group }} </em>
+            <p></p>
+            <a href="{% url 'delete-student' id=student.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            <a href="{% url 'update-student' student.student_profile.pk %}"><button class="edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
+            <hr class="featurette-divider">
+        {% endfor %}
+    </div>
+
+{% endblock content %}

@@ -8,9 +8,11 @@
         <hr class="featurette-divider">
         {% for element in announces %}
             <h4> {{ element.title }} </h4>
-            <p> Автор объявления: {{ element.course.author }} </p>
-            <p> Дисциплина: {{ element.course.title }}</p>
-            <p> Дата публикации: {{ element.publish_date|format }} </p>
+            <em> Автор объявления: {{ element.course.author }} </em>
+            <br/>
+            <em> Дисциплина: {{ element.course.title }}</em>
+            <br/>
+            <em> Дата публикации: {{ element.publish_date|format }} </em>
             <p> {{ element.text }} </p>
             {% define_profile user as profile_ch %}
             {% if profile_ch == 'teacher' %}

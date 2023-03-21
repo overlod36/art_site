@@ -36,3 +36,16 @@
     border-radius: 8px;
     font-size: 17px;
 }
+
+.edit{
+    background-color: orange;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.announces em{
+    white-space: pre-line;
+}

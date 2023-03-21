@@ -36,11 +36,19 @@
             <div class="list-group">
                 <a class="text-decoration-none link-secondary" href="{% url 'group-create' %}"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
                 <div class="dropend">
-                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset">
+                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset1" data-bs-toggle="dropdown" data-bs-offset="0,45"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset1">
                         <li><a class="dropdown-item" href="{% url 'student-create' %}">Добавление студента</a></li>
                         <li><a class="dropdown-item" href="{% url 'teacher-create' %}">Добавление преподавателя</a></li>
                         <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
+                    </ul>
+                </div>
+                <div class="dropend">
+                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset2" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Отображение пользователей</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset2">
+                        <li><a class="dropdown-item" href="{% url 'students' %}">Студенты</a></li>
+                        <li><a class="dropdown-item" href="#">Преподаватели</a></li>
+                        <li><a class="dropdown-item" href="#">Администраторы</a></li>
                     </ul>
                 </div>
             </div>
