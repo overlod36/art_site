@@ -11,7 +11,7 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm
-from .models import Student_Profile
+from .models import Student_Profile, Teacher_Profile, Admin_Profile
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -54,6 +54,34 @@ class TeacherCreateView(LoginRequiredMixin, CreateView):
         profile.save()
         return redirect(self.get_success_url())
 
+class TeachersListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = 'users/teachers_list.html'
+    context_object_name = 'teachers'
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(TeachersListView, self).dispatch(request)
+
+    def get_queryset(self):
+        return User.objects.filter(teacher_profile__id__isnull=False)
+
+class TeacherUpdateView(LoginRequiredMixin, UpdateView):
+    model = Teacher_Profile
+    template_name = 'users/user_update.html'
+    fields = ['first_name', 'last_name', 'sur_name']
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
+
 class AdminCreateView(LoginRequiredMixin, CreateView):
     form_class = AdminForm
     template_name = 'users/admin_create.html'
@@ -79,6 +107,34 @@ class AdminCreateView(LoginRequiredMixin, CreateView):
         profile.save()
         return redirect(self.get_success_url())
 
+class AdminUpdateView(LoginRequiredMixin, UpdateView):
+    model = Admin_Profile
+    template_name = 'users/user_update.html'
+    fields = ['first_name', 'last_name', 'sur_name']
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
+
+class AdminsListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = 'users/admins_list.html'
+    context_object_name = 'admins'
+
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            return super(AdminsListView, self).dispatch(request)
+
+    def get_queryset(self):
+        return User.objects.filter(admin_profile__id__isnull=False)
+
 class StudentsListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users/students_list.html'
@@ -97,7 +153,7 @@ class StudentsListView(LoginRequiredMixin, ListView):
 
 class StudentUpdateView(LoginRequiredMixin, UpdateView):
     model = Student_Profile
-    template_name = 'users/student_update.html'
+    template_name = 'users/user_update.html'
     fields = ['first_name', 'last_name', 'sur_name', 'group']
 
     def get_success_url(self):
@@ -131,9 +187,9 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
         profile.save()
         return redirect(self.get_success_url())
 
-class StudentDeleteView(LoginRequiredMixin, DeleteView):
+class UserDeleteView(LoginRequiredMixin, DeleteView):
     model = User
-    template_name = 'users/student_delete.html'
+    template_name = 'users/user_delete.html'
 
     def get_success_url(self):
         return reverse('main')

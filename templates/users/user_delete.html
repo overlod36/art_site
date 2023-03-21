@@ -1,10 +1,10 @@
 {% extends "base_app/base.html" %}
 {% block content %}
 
-<p>Вы действительно хотите удалить {{name}}?</p>
+<p>Вы действительно хотите удалить пользователя?</p>
 <form action="" method="POST">
     {% csrf_token %}
-    <a href="{% url 'students' %}">Отмена</a>
+    <a href="{% url 'profile' %}">Отмена</a>
     <input type="submit" name="Confirm" value="Подтвердить">
 
 </form>

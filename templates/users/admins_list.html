@@ -1,0 +1,17 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+
+    <div class="admins">
+        <hr class="featurette-divider">
+        {% for admin in admins %}
+            <p> Администратор {{ admin.admin_profile.last_name }} {{ admin.admin_profile.first_name }}</p>
+            <em> Логин: {{ admin.username }} </em>
+            <p></p>
+            <a href="{% url 'delete-admin' admin.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            <a href="{% url 'update-admin' admin.admin_profile.pk %}"><button class="edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
+            <hr class="featurette-divider">
+        {% endfor %}
+    </div>
+
+{% endblock content %}
