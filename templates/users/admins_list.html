@@ -8,8 +8,12 @@
             <p> Администратор {{ admin.admin_profile.last_name }} {{ admin.admin_profile.first_name }}</p>
             <em> Логин: {{ admin.username }} </em>
             <p></p>
-            <a href="{% url 'delete-admin' admin.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            {% if not admin.pk == request.user.pk %}
+                <a href="{% url 'delete-admin' admin.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            {% endif %}
             <a href="{% url 'update-admin' admin.admin_profile.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
+            <a href="{% url 'update-log' admin.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/edit-user-16.png' %}" alt="">Изменить логин</button></a>
+            <a href="{% url 'update-pass' admin.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/key-6-16.png' %}" alt="">Изменить пароль</button></a>
             <hr class="featurette-divider">
         {% endfor %}
     </div>

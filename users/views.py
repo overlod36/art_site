@@ -144,7 +144,7 @@ class AdminCreateView(LoginRequiredMixin, CreateView):
     def dispatch(self, request):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
-        if not hasattr(request.user, 'admin_profile'):
+        if not hasattr(request.user, 'admin_profile') or not request.user.is_superuser:
             return HttpResponse(status=400)
         else:
             return super(AdminCreateView, self).dispatch(request)
@@ -164,6 +164,14 @@ class AdminUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'users/user_update.html'
     fields = ['first_name', 'last_name', 'sur_name']
 
+    def dispatch(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile') or not request.user.is_superuser:
+            return HttpResponse(status=400)
+        else:
+            return super(AdminsListView, self).dispatch(request)
+
     def get_success_url(self):
         return reverse('main')
 
@@ -179,7 +187,7 @@ class AdminsListView(LoginRequiredMixin, ListView):
     def dispatch(self, request):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
-        if not hasattr(request.user, 'admin_profile'):
+        if not hasattr(request.user, 'admin_profile') or not request.user.is_superuser:
             return HttpResponse(status=400)
         else:
             return super(AdminsListView, self).dispatch(request)

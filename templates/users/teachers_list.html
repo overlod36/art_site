@@ -10,6 +10,8 @@
             <p></p>
             <a href="{% url 'delete-teacher' teacher.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
             <a href="{% url 'update-teacher' teacher.teacher_profile.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
+            <a href="{% url 'update-log' teacher.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/edit-user-16.png' %}" alt="">Изменить логин</button></a>
+            <a href="{% url 'update-pass' teacher.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/key-6-16.png' %}" alt="">Изменить пароль</button></a>
             <hr class="featurette-divider">
         {% endfor %}
     </div>

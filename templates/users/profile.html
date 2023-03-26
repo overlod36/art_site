@@ -40,7 +40,9 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset1">
                         <li><a class="dropdown-item" href="{% url 'student-create' %}">Добавление студента</a></li>
                         <li><a class="dropdown-item" href="{% url 'teacher-create' %}">Добавление преподавателя</a></li>
-                        <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
+                        {% if request.user.is_superuser %}
+                            <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="dropend">
@@ -48,7 +50,9 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset2">
                         <li><a class="dropdown-item" href="{% url 'students' %}">Студенты</a></li>
                         <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
-                        <li><a class="dropdown-item" href="{% url 'admins' %}">Администраторы</a></li>
+                        {% if request.user.is_superuser %}
+                            <li><a class="dropdown-item" href="{% url 'admins' %}">Администраторы</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
