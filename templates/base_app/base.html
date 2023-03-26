@@ -18,15 +18,18 @@
             <a class="nav-item nav-link" href="{% url 'announces' %}">Объявления</a>
           </div>
           <div class="right-nav navbar-nav">
-            {% if user.is_authenticated %}
-              {% define_profile user as check %}
+            {% if request.user.is_authenticated %}
+              {% define_profile request.user as check %}
               {% if check == 'teacher' %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
               {% elif check == 'admin' %}
-                <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
+                {% if user.is_superuser %}
+                  <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
+                {% endif %}
               {% endif %}
-              <a class="nav-item nav-link" href="{% url 'profile'%}"><img class="use-ico" src="{% static 'img/user.png' %}" alt="">{{ user.username }}</a>
+              {% return_login request.user as login %}
+              <a class="nav-item nav-link" href="{% url 'profile'%}"><img class="use-ico" src="{% static 'img/user.png' %}" alt="">{{ login }}</a>
               <a class="nav-item nav-link" href="{% url 'logout' %}">Выход</a>
             {% else %}
               <a class="nav-item nav-link" href="{% url 'login' %}">Вход</a>

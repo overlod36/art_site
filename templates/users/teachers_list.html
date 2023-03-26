@@ -8,8 +8,8 @@
             <p> Студент {{ teacher.teacher_profile.last_name }} {{ teacher.teacher_profile.first_name }}</p>
             <em> Логин: {{ teacher.username }} </em>
             <p></p>
-            <a href="{% url 'delete-teacher' teacher.pk %}"><button class="trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-            <a href="{% url 'update-teacher' teacher.teacher_profile.pk %}"><button class="edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
+            <a href="{% url 'delete-teacher' teacher.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            <a href="{% url 'update-teacher' teacher.teacher_profile.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Изменить</button></a>
             <hr class="featurette-divider">
         {% endfor %}
     </div>

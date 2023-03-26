@@ -28,7 +28,7 @@
     margin-bottom: 0.5em;
 }
 
-.trash{
+.button-trash{
     background-color: red;
     color: white;
     border: none;
@@ -37,8 +37,17 @@
     font-size: 17px;
 }
 
-.edit{
+.button-edit{
     background-color: orange;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.button-password{
+    background-color: greenyellow;
     color: white;
     border: none;
     padding: 8px 14px;

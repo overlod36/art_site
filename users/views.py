@@ -10,12 +10,13 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm
+from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm, UserForm
 from .models import Student_Profile, Teacher_Profile, Admin_Profile
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.forms import modelform_factory
 
 @login_required(login_url='/login/')
 @check_profile_activation
@@ -29,6 +30,57 @@ def profile(request):
     elif hasattr(request.user, 'admin_profile'):
         context = { 'profile': request.user.admin_profile }
     return render(request, 'users/profile.html', context)
+
+class PasswordUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    template_name = 'users/pass_update.html'
+    fields = ['password']
+    initial = {'password': ''}
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['pk']
+            return super(PasswordUpdateView, self).dispatch(request, *args, **kwargs)
+    
+    def get_form_class(self):
+        return modelform_factory(self.object.__class__, fields=self.fields, labels={'password': 'Пароль'})
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.password = make_password(form['password'].value())
+        user.save()
+        return redirect(self.get_success_url())
+    
+class LoginUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    template_name = 'users/log_update.html'
+    fields = ['username']
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'admin_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['pk']
+            return super(LoginUpdateView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_class(self):
+        return modelform_factory(self.object.__class__, fields=self.fields, labels={'username': 'Логин'})
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
 
 class TeacherCreateView(LoginRequiredMixin, CreateView):
     form_class = TeacherForm

@@ -20,4 +20,7 @@ urlpatterns = [
     path('admins/', views.AdminsListView.as_view(), name='admins'),
     path('teacher/delete/<pk>/', views.UserDeleteView.as_view(), name='delete-teacher'),
     path('admins/delete/<pk>/', views.UserDeleteView.as_view(), name='delete-admin'),
+    path('users/update/password/<pk>', views.PasswordUpdateView.as_view(), name='update-pass'),
+    path('users/update/login/<pk>', views.LoginUpdateView.as_view(), name='update-log')
+    
 ]
