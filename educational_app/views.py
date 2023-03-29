@@ -25,6 +25,8 @@ class LectureCreateView(LoginRequiredMixin, CreateView):
             return HttpResponse(status=400)
         if not hasattr(request.user, 'teacher_profile'):
             return HttpResponse(status=400)
+        if Course.objects.get(pk=kwargs['id']).author != request.user.teacher_profile:
+            return HttpResponse(status=400)
         else:
             self.pk = kwargs['id']
             return super(LectureCreateView, self).dispatch(request)

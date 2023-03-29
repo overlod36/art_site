@@ -12,7 +12,9 @@
             <br/>
             <p></p>
         {% endfor %}
-        <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
+        {% if request.user.teacher_profile %}
+            <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
+        {% endif %}
     </div>
 
 {% endblock content %}
