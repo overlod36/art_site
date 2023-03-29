@@ -1,10 +1,18 @@
 {% extends "base_app/base.html" %}
+{% load static %}
 {% block content %}
 
     <div class="course">
         <h2> {{ course.title }} </h2>
         <p> {{ course.author }} </p>
         <p> Описание курса: {{ course.description }} </p>
+        <p> Лекции </p>
+        {% for lec in lectures %}
+            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
+            <br/>
+            <p></p>
+        {% endfor %}
+        <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
     </div>
 
 {% endblock content %}

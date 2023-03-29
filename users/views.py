@@ -22,13 +22,11 @@ from django.forms import modelform_factory
 @check_profile_activation
 def profile(request):
     if hasattr(request.user, 'student_profile'):
-        context = { 'profile' : request.user.student_profile , 
-                   'courses': Course.objects.filter(groups = request.user.student_profile.group) }
+        context = { 'courses': Course.objects.filter(groups = request.user.student_profile.group) }
     elif hasattr(request.user, 'teacher_profile'):
-        context = { 'profile': request.user.teacher_profile ,
-                   'courses': Course.objects.filter(author = request.user.teacher_profile)}
+        context = { 'courses': Course.objects.filter(author = request.user.teacher_profile)}
     elif hasattr(request.user, 'admin_profile'):
-        context = { 'profile': request.user.admin_profile }
+        context = {}
     return render(request, 'users/profile.html', context)
 
 class PasswordUpdateView(LoginRequiredMixin, UpdateView):

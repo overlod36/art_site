@@ -5,13 +5,13 @@
 
 <div class="content-section">
     <div class="media-body">
-        <h2 class="account-heading">{{ profile.user.username }}</h2>
+        <h2 class="account-heading">{{ request.user.username }}</h2>
         {% define_profile user as profile_ch %}
         {% if profile_ch == 'student' %}
             
-            <p class="text-secondary"> Студент {{ profile.last_name }} {{ profile.first_name }} </p>
+            <p class="text-secondary"> Студент {{ request.user.student_profile.last_name }} {{ request.user.student_profile.first_name }} </p>
 
-            <p class="text-secondary"> Группа {{ profile.group.number }}</p>
+            <p class="text-secondary"> Группа {{ request.user.student_profile.group.number }}</p>
 
             <div class="courses_list">
                 <div class="list-group">
@@ -22,7 +22,7 @@
             </div>
 
         {% elif profile_ch == 'teacher' %}
-            <p class="text-secondary"> Преподаватель {{ profile.last_name }} {{ profile.first_name }} </p>
+            <p class="text-secondary"> Преподаватель {{ request.user.teacher_profile.last_name }} {{ request.user.teacher_profile.first_name }} </p>
             <div class="bg-light p-5 rounded">
                 <h4>Дисциплины</h4>
                 <div class="list-group">
@@ -32,7 +32,7 @@
                 </div>
             </div>
         {% elif profile_ch == 'admin' %}
-            <p class="text-secondary"> Администратор {{ profile.user.username }} </p>
+            <p class="text-secondary"> Администратор {{ request.user.username }} </p>
             <div class="list-group">
                 <a class="text-decoration-none link-secondary" href="{% url 'group-create' %}"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
                 <div class="dropend">

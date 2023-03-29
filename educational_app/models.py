@@ -56,6 +56,10 @@ class Lecture(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина' ,on_delete=models.CASCADE)
     file = models.FileField(upload_to=get_lecture_file_path)
 
+    @property
+    def filename(self):
+        return str(os.path.basename(self.file.name))
+
 
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):

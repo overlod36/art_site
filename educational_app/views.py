@@ -9,10 +9,32 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Course
+from .models import Course, Lecture
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile
 from .decorators import check_course_existence, course_access
+from django.http import HttpRequest
+
+class LectureCreateView(LoginRequiredMixin, CreateView):
+    model = Lecture
+    template_name = 'educational/lecture_create.html'
+    fields = ['file']
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['id']
+            return super(LectureCreateView, self).dispatch(request)
+    
+    def form_valid(self, form):
+        form.instance.course = Course.objects.get(pk=self.pk)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('main')
 
 class CourseCreateView(LoginRequiredMixin, CreateView):
     model = Course
@@ -39,6 +61,15 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
 @check_course_existence
 @course_access
 def get_course(request, id):
-    return render(request, 'educational/course.html', {'course': Course.objects.filter(pk=id).first()})
+    f_course = Course.objects.filter(pk=id).first()
+    return render(request, 'educational/course.html', 
+                  {'course': f_course, 
+                   'lectures': Lecture.objects.filter(course=f_course).all()})
+
+def get_lecture(request, id):
+    lecture = Lecture.objects.get(pk=id)
+    resp = HttpResponse(lecture.file, content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="{ lecture.filename }"'
+    return resp
 
 
