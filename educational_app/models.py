@@ -22,11 +22,18 @@ def transliterate(string):
         string = string.replace(key, char_dict[key])
     return string
 
-def get_file_path(instance, filename):
-    return os.path.join("%s" % instance.course.code_name, filename)
+def get_lecture_file_path(instance, filename):
+    return os.path.join("%s" % instance.course.code_name, 'lectures' ,filename)
 
 def get_transliteration(title):
     return transliterate(title.lower())
+
+def remove_folder(path):
+    if os.path.isdir(path):
+        Path(os.path.join(path)).rmdir()
+
+def create_folder(path):
+    os.makedirs(path)
 
 class Course(models.Model):
     title = models.CharField(verbose_name='Название дисциплины', max_length=50)
@@ -38,14 +45,16 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         if not self.code_name:
             self.code_name = get_transliteration(getattr(self, 'title'))
-        os.makedirs(os.path.join(PATH, 'content', self.code_name))
+        create_folder(os.path.join(PATH, 'content', self.code_name, 'lectures'))
+        create_folder(os.path.join(PATH, 'content', self.code_name, 'tests'))
+        create_folder(os.path.join(PATH, 'content', self.code_name, 'tasks'))
         super(Course, self).save(*args, **kwargs)
     def __str__(self):
         return f"Курс: {self.title}, преподаватель: {self.author}"
 
 class Lecture(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина' ,on_delete=models.CASCADE)
-    file = models.FileField(upload_to=get_file_path)
+    file = models.FileField(upload_to=get_lecture_file_path)
 
 
 @receiver(pre_delete, sender=Lecture)
@@ -54,5 +63,8 @@ def delete_lecture_file(sender, instance, *args, **kwargs):
 
 @receiver(pre_delete, sender=Course)
 def delete_course_folder(sender, instance, *args, **kwargs):
-    Path(os.path.join(PATH, 'content', instance.code_name)).rmdir()
-    # if os.path.isfile(path): os.remove(path)
+    course_path = os.path.join(PATH, 'content', instance.code_name)
+    remove_folder(os.path.join(course_path, 'lectures'))
+    remove_folder(os.path.join(course_path, 'tests'))
+    remove_folder(os.path.join(course_path, 'tasks'))
+    remove_folder(course_path)

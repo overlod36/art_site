@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Lecture',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to=educational_app.models.get_file_path)),
+                ('file', models.FileField(upload_to=educational_app.models.get_lecture_file_path)),
                 ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='educational_app.course', verbose_name='Дисциплина')),
             ],
         ),
