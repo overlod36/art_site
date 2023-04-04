@@ -19,11 +19,10 @@
           </div>
           <div class="right-nav navbar-nav">
             {% if request.user.is_authenticated %}
-              {% define_profile request.user as check %}
-              {% if check == 'teacher' %}
+              {% if request.user.teacher_profile %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
-              {% elif check == 'admin' %}
+              {% elif request.user.admin_profile %}
                 {% if user.is_superuser %}
                   <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
                 {% endif %}

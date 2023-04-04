@@ -1,5 +1,12 @@
 from django.shortcuts import redirect, render
-from .models import Course
+from .models import Course, Test
+
+def check_test_existence(view_function):
+    def wrapper_function(request, *args, **kwargs):
+        if Test.objects.filter(pk=kwargs['id']).exists():
+            return view_function(request, *args, **kwargs)
+        return render(request, 'base_app/error.html', {'error': 'Такого теста нет!'})
+    return wrapper_function
 
 def check_course_existence(view_function):
     def wrapper_function(request, *args, **kwargs):

@@ -1,5 +1,6 @@
 {% extends "base_app/base.html" %}
 {% load static %}
+{% load date_filter %}
 {% block content %}
 
     <div class="course">
@@ -13,8 +14,31 @@
             <p></p>
         {% endfor %}
         {% if request.user.teacher_profile %}
-            <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
+            <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
         {% endif %}
+        <h2>Объявления</h2>
+        <p></p>
+        {% for ann in announces %}
+            <h4> {{ ann.title }} </h4>
+            <em> Автор объявления: {{ ann.course.author }} </em>
+            <br/>
+            <em> Дисциплина: {{ ann.course.title }}</em>
+            <br/>
+            <em> Дата публикации: {{ ann.publish_date|format }} </em>
+            <p> {{ ann.text }} </p>
+            {% if request.user.teacher_profile %}
+                <a href="{% url 'delete-announce' id=ann.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            {% endif %}
+            <hr class="featurette-divider">
+        {% endfor %}
+        <p></p>
+        {% if request.user.teacher_profile %}
+            <a href="{% url 'one-ann-create' course.pk %}"><button class="button-password" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/pencil-2-16.png' %}" alt="">Опубликовать объявление</button></a>
+        {% endif %}
+        <p></p>
+        {% for test in tests %}
+            <a href="{% url 'test' test.pk %}">Тест</a>
+        {% endfor %}
     </div>
 
 {% endblock content %}

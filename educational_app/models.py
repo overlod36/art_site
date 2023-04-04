@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from users.models import Teacher_Profile, Study_Group
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
@@ -23,7 +24,10 @@ def transliterate(string):
     return string
 
 def get_lecture_file_path(instance, filename):
-    return os.path.join("%s" % instance.course.code_name, 'lectures' ,filename)
+    return os.path.join("%s" % instance.course.code_name, 'lectures', filename)
+
+def get_test_file_path(instance, filename):
+    return os.path.join("%s" % instance.course.code_name, 'tests', filename)
 
 def get_transliteration(title):
     return transliterate(title.lower())
@@ -54,12 +58,19 @@ class Course(models.Model):
 
 class Lecture(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина' ,on_delete=models.CASCADE)
-    file = models.FileField(upload_to=get_lecture_file_path)
+    file = models.FileField(upload_to=get_lecture_file_path, null=False, validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
 
     @property
     def filename(self):
         return str(os.path.basename(self.file.name))
 
+class Test(models.Model):
+    course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
+    file = models.FileField(upload_to=get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
+
+    @property
+    def filepath(self):
+        return str(self.file.path)
 
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):

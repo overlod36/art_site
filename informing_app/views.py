@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from . models import Course_Announce
 from educational_app.models import Course
-from .forms import ClassAnnounceForm
+from .forms import OneCourseAnnounceForm, CourseAnnounceForm
 from django.views.generic import (
     ListView,
     DetailView,
@@ -36,14 +36,34 @@ def delete_announce(request, id):
     context = { 'item': announce , 'name': 'объявление' }
     return render(request, 'informing/announce_delete.html', context)
 
-class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
-    form_class = ClassAnnounceForm
+class OneCourseAnnounceCreateView(LoginRequiredMixin, CreateView):
+    form_class = OneCourseAnnounceForm
     template_name = 'informing/announce_create.html'
 
     def get_success_url(self):
         return reverse('announces')
 
-    def dispatch(self, request):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['pk']
+            return super(OneCourseAnnounceCreateView, self).dispatch(request)
+
+    def form_valid(self, form):
+        form.instance.course = Course.objects.get(pk=self.pk)
+        return super().form_valid(form)
+
+class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
+    form_class = CourseAnnounceForm
+    template_name = 'informing/announce_create.html'
+
+    def get_success_url(self):
+        return reverse('announces')
+
+    def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
         if not hasattr(request.user, 'teacher_profile'):
@@ -57,5 +77,4 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        form.instance.author = self.request.user.teacher_profile
         return super().form_valid(form)

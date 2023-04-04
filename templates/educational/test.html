@@ -1,0 +1,19 @@
+{% extends "base_app/base.html" %}
+{% block content %}
+<h2> {{ test.title }} </h2>
+{% for question in test.questions %}
+    <em>{{question.text}}</em>
+    <p></p>
+    {% if question.type == 'TF' %}
+        <input type="radio" value="true"/> <label for="true">True</label>
+        <input type="radio" value="false"/> <label for="false">False</label>
+    {% elif question.type == 'AO' %}
+        {% for choice in question.choices %}
+            <input type="radio" value="{{ choice }}"/> <label for="{{ choice }}">{{ choice }}</label>
+        {% endfor %}
+    {% elif question.type == 'O' %}
+        <p>Пока ничего нет!</p>
+    {% endif %}
+    <p></p>
+{% endfor %}
+{% endblock content %}
