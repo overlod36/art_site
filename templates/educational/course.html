@@ -7,7 +7,7 @@
         <h2> {{ course.title }} </h2>
         <p> {{ course.author }} </p>
         <p> Описание курса: {{ course.description }} </p>
-        <p> Лекции </p>
+        <h3> Лекции </h3>
         {% for lec in lectures %}
             <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
             <br/>
@@ -16,7 +16,7 @@
         {% if request.user.teacher_profile %}
             <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
         {% endif %}
-        <h2>Объявления</h2>
+        <h3>Объявления</h3>
         <p></p>
         {% for ann in announces %}
             <h4> {{ ann.title }} </h4>
@@ -36,8 +36,9 @@
             <a href="{% url 'one-ann-create' course.pk %}"><button class="button-password" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/pencil-2-16.png' %}" alt="">Опубликовать объявление</button></a>
         {% endif %}
         <p></p>
+        <h3>Тесты</h3>
         {% for test in tests %}
-            <a href="{% url 'test' test.pk %}">Тест</a>
+            <a href="{% url 'test' test.pk %}">{{ test.name }}</a>
         {% endfor %}
     </div>
 

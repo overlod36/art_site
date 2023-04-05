@@ -14,6 +14,7 @@ from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile
 from .decorators import check_course_existence, course_access, check_test_existence
+from .forms import QuizShowForm
 from django.http import HttpRequest
 import json
 
@@ -77,7 +78,13 @@ def get_test(request, id):
     test = Test.objects.get(pk=id)
     with open(test.filepath, encoding='utf-8') as json_file:
         test_f = json.load(json_file)
-    return render(request, 'educational/test.html', {'test': test_f})
+    
+    form = QuizShowForm(questions=test_f['questions'])
+    
+    if request.method == 'POST':
+        print(request.POST)
+
+    return render(request, 'educational/test.html', {'form': form})
 
 def get_lecture(request, id):
     lecture = Lecture.objects.get(pk=id)

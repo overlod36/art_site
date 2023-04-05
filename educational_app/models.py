@@ -23,14 +23,16 @@ def transliterate(string):
         string = string.replace(key, char_dict[key])
     return string
 
+
+def get_transliteration(title):
+    return transliterate(title.lower())
+
 def get_lecture_file_path(instance, filename):
     return os.path.join("%s" % instance.course.code_name, 'lectures', filename)
 
 def get_test_file_path(instance, filename):
-    return os.path.join("%s" % instance.course.code_name, 'tests', filename)
-
-def get_transliteration(title):
-    return transliterate(title.lower())
+    filename = f'{get_transliteration(instance.name)}.json'
+    return os.path.join("%s" % instance.course.code_name, 'tests', get_transliteration(instance.name) , filename)
 
 def remove_folder(path):
     if os.path.isdir(path):
@@ -65,6 +67,9 @@ class Lecture(models.Model):
         return str(os.path.basename(self.file.name))
 
 class Test(models.Model):
+    name = models.CharField(verbose_name='Название теста', max_length=50, blank=False)
+    # duration = models.DurationField(verbose_name='Длительность теста')
+    # expiration_date = models.DateTimeField(verbose_name='Срок сдачи')
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
     file = models.FileField(upload_to=get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
 
@@ -83,3 +88,8 @@ def delete_course_folder(sender, instance, *args, **kwargs):
     remove_folder(os.path.join(course_path, 'tests'))
     remove_folder(os.path.join(course_path, 'tasks'))
     remove_folder(course_path)
+
+@receiver(pre_delete, sender=Test)
+def delete_test_file(sender, instance, *args, **kwargs):
+    if instance.file: instance.file.delete()
+    remove_folder(os.path.join(PATH, 'content', get_transliteration(getattr(instance.course, 'title')), 'tests', get_transliteration(instance.name)))
