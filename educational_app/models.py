@@ -1,45 +1,12 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
-from users.models import Teacher_Profile, Study_Group
+from users.models import Teacher_Profile, Study_Group, Student_Profile
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 import os
+import shutil
 from pathlib import Path
-
-PATH = str(Path(os.path.dirname(os.path.abspath(__file__))).parent)
-
-def transliterate(string):
-    char_dict = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
-      'ж':'zh','з':'z','и':'i','й':'i','к':'k','л':'l','м':'m','н':'n',
-      'о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h',
-      'ц':'c','ч':'cz','ш':'sh','щ':'scz','ъ':'','ы':'y','ь':'','э':'e',
-      'ю':'u','я':'ja', ',':'','?':'',' ':'_','~':'','!':'','@':'','#':'',
-      '$':'','%':'','^':'','&':'','*':'','(':'',')':'','-':'','=':'','+':'',
-      ':':'',';':'','<':'','>':'','\'':'','"':'','\\':'','/':'','№':'',
-      '[':'',']':'','{':'','}':'','ґ':'','ї':'', 'є':'','Ґ':'g','Ї':'i',
-      'Є':'e', '—':''}
-    
-    for key in char_dict:
-        string = string.replace(key, char_dict[key])
-    return string
-
-
-def get_transliteration(title):
-    return transliterate(title.lower())
-
-def get_lecture_file_path(instance, filename):
-    return os.path.join("%s" % instance.course.code_name, 'lectures', filename)
-
-def get_test_file_path(instance, filename):
-    filename = f'{get_transliteration(instance.name)}.json'
-    return os.path.join("%s" % instance.course.code_name, 'tests', get_transliteration(instance.name) , filename)
-
-def remove_folder(path):
-    if os.path.isdir(path):
-        Path(os.path.join(path)).rmdir()
-
-def create_folder(path):
-    os.makedirs(path)
+from . import file_methods
 
 class Course(models.Model):
     title = models.CharField(verbose_name='Название дисциплины', max_length=50)
@@ -50,17 +17,17 @@ class Course(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code_name:
-            self.code_name = get_transliteration(getattr(self, 'title'))
-        create_folder(os.path.join(PATH, 'content', self.code_name, 'lectures'))
-        create_folder(os.path.join(PATH, 'content', self.code_name, 'tests'))
-        create_folder(os.path.join(PATH, 'content', self.code_name, 'tasks'))
+            self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'lectures'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'tests'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'tasks'))
         super(Course, self).save(*args, **kwargs)
     def __str__(self):
         return f"Курс: {self.title}, преподаватель: {self.author}"
 
 class Lecture(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина' ,on_delete=models.CASCADE)
-    file = models.FileField(upload_to=get_lecture_file_path, null=False, validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
+    file = models.FileField(upload_to=file_methods.get_lecture_file_path, null=False, validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
 
     @property
     def filename(self):
@@ -71,7 +38,16 @@ class Test(models.Model):
     # duration = models.DurationField(verbose_name='Длительность теста')
     # expiration_date = models.DateTimeField(verbose_name='Срок сдачи')
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
+    file = models.FileField(upload_to=file_methods.get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
+
+    @property
+    def filepath(self):
+        return str(self.file.path)
+
+class Test_Attempt(models.Model):
+    test = models.ForeignKey(Test, null=False, verbose_name='Тест', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student_Profile, null=False, verbose_name='Студент', on_delete=models.CASCADE)
+    file = models.FileField(upload_to=file_methods.get_test_attempt_file_path, null=False, validators=[FileExtensionValidator(['json'])])
 
     @property
     def filepath(self):
@@ -83,13 +59,17 @@ def delete_lecture_file(sender, instance, *args, **kwargs):
 
 @receiver(pre_delete, sender=Course)
 def delete_course_folder(sender, instance, *args, **kwargs):
-    course_path = os.path.join(PATH, 'content', instance.code_name)
-    remove_folder(os.path.join(course_path, 'lectures'))
-    remove_folder(os.path.join(course_path, 'tests'))
-    remove_folder(os.path.join(course_path, 'tasks'))
-    remove_folder(course_path)
+    course_path = os.path.join(file_methods.PATH, 'content', instance.code_name)
+    file_methods.remove_folder(os.path.join(course_path, 'lectures'))
+    file_methods.remove_folder(os.path.join(course_path, 'tests'))
+    file_methods.remove_folder(os.path.join(course_path, 'tasks'))
+    file_methods.remove_folder(course_path)
 
 @receiver(pre_delete, sender=Test)
 def delete_test_file(sender, instance, *args, **kwargs):
     if instance.file: instance.file.delete()
-    remove_folder(os.path.join(PATH, 'content', get_transliteration(getattr(instance.course, 'title')), 'tests', get_transliteration(instance.name)))
+    file_methods.remove_tree(os.path.join(file_methods.PATH, 'content', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests', file_methods.get_transliteration(instance.name)))
+
+@receiver(pre_delete, sender=Test_Attempt)
+def delete_test_attempt_file(sender, instance, *args, **kwargs):
+    if instance.file: instance.file.delete()

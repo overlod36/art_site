@@ -1,5 +1,10 @@
 from django.forms import Form
 from django.forms import ChoiceField, RadioSelect, CharField, Textarea
+from .models import Test_Attempt
+from django.core.files import File
+import json
+import os
+from . import file_methods
 
 class QuizShowForm(Form):
     
@@ -11,12 +16,23 @@ class QuizShowForm(Form):
             counter += 1
             match question['type']:
                 case 'TF':
-                    self.fields[f'TF_field_{counter}'] = ChoiceField(label=question['text'], required=True, 
-                                        choices=((True, 'Да'), (False, 'Нет')), widget=RadioSelect)
+                    self.fields[f'TF_field_{counter}'] = ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True, 
+                                        choices=(('True', 'Да'), ('False', 'Нет')), widget=RadioSelect)
                 case 'O':
-                    self.fields[f'O_field_{counter}'] = CharField(label=question['text'], widget=Textarea) 
+                    self.fields[f'O_field_{counter}'] = CharField(label=f'{question["text"]} ({question["mark"]} баллов)', widget=Textarea) 
                 case 'AO':
-                    choices = [(i, question['choices'][i-1]) for i in range(1, len(question['choices']))]
-                    self.fields[f'AO_field_{counter}'] = ChoiceField(label=question['text'], required=True,
+                    choices = [(i, question['choices'][i-1]) for i in range(1, len(question['choices']) + 1)]
+                    self.fields[f'AO_field_{counter}'] = ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True,
                                            choices=choices, widget=RadioSelect)
-        
+    
+    def save(self, solution, user, test, *args, **kwargs):
+        interm_file_path = os.path.join(file_methods.PATH, 'intermediate_content', 
+                              f'{file_methods.get_transliteration(test.name)}.json')
+        f = open(interm_file_path, 'a+', encoding='utf-8')
+        res_str = json.dumps(solution, indent = 2, ensure_ascii=False)
+        f.write(res_str)
+        test_attempt = Test_Attempt(test=test, student=user.student_profile, file=File(f))
+        test_attempt.save()
+        f.close()
+        os.remove(interm_file_path)
+

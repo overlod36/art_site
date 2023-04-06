@@ -61,6 +61,27 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('main')
 
+def solution_dict_to_list(dit: dict):
+    return [(dit[key][0], key) for key in dit]
+
+def test_dict_to_list(lt: list):
+    return [(el['answer'], el['text'], el['mark'], el['choices']) if el['type'] == 'AO' else (el['answer'], el['text'], el['mark']) for el in lt]
+
+def generate_solution_file(test: list, solution: list):
+    res = {}
+    for i in range(len(solution)):
+        match solution[i][1][0]:
+            case 'T':
+                if solution[i][0] == test[i][0]: res[test[i][1]] = [solution[i][0], test[i][2]]
+                else: res[test[i][1]] = [solution[i][0], 0]
+            case 'O':
+                if solution[i][0].lower() == test[i][0].lower(): res[test[i][1]] = [solution[i][0], test[i][2]]
+                else: res[test[i][1]] = [solution[i][0], 0]
+            case 'A':
+                if int(solution[i][0]) == test[i][0]: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], test[i][2]]
+                else: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], 0]
+    return res        
+
 @login_required(login_url='/login/')
 @check_course_existence
 @course_access
@@ -82,8 +103,15 @@ def get_test(request, id):
     form = QuizShowForm(questions=test_f['questions'])
     
     if request.method == 'POST':
-        print(request.POST)
-
+        res = dict(request.POST)
+        del res['csrfmiddlewaretoken']
+        test_list = test_dict_to_list(test_f['questions'])
+        total_points = sum([question[2] for question in test_list])
+        solution = generate_solution_file(test_list, solution_dict_to_list(res))
+        # РАЗНЫЕ ПУТИ ДЛЯ преподавателей и студентов
+        form.save(solution, request.user, test)
+        res_points = sum([solution[ans][1] for ans in solution])
+        return render(request, 'educational/test_res.html', {'res': res_points, 'total': total_points})
     return render(request, 'educational/test.html', {'form': form})
 
 def get_lecture(request, id):

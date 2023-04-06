@@ -3,7 +3,7 @@
 import django.core.validators
 from django.db import migrations, models
 import educational_app.models
-
+import educational_app.file_methods
 
 class Migration(migrations.Migration):
 
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='lecture',
             name='file',
-            field=models.FileField(upload_to=educational_app.models.get_lecture_file_path, validators=[django.core.validators.FileExtensionValidator(['pdf', 'doc', 'docx'])]),
+            field=models.FileField(upload_to=educational_app.file_methods.get_lecture_file_path, validators=[django.core.validators.FileExtensionValidator(['pdf', 'doc', 'docx'])]),
         ),
     ]
