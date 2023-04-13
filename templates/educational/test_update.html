@@ -7,18 +7,15 @@
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Тест</legend>
                 {% for field in form %}
-                    {% if field.label != 'Quiz show' %}
-                        {{ field.label }}
-                        {{ field }}
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    <p></p>
+                    <div class="test-up_f">{{ field.label }}: {{ field }}</div>
                 {% endfor %}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Отправить</button>
+                <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Изменить</button>
             </div>
+            {% for q in questions %}
+                <div class="test-q"> Вопрос {{ q.text }} Количество баллов {{q.mark}} Правильный ответ {{q.answer}}</div>
+            {% endfor %}
         </form>
     </div>
 {% endblock content %}

@@ -12,6 +12,10 @@
             <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
             <br/>
             <p></p>
+            {% if request.user.teacher_profile %}
+                <a href="{% url 'lecture-delete' lec.pk %}"><button class="lec-button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            {% endif %}
+            <p></p>
         {% endfor %}
         {% if request.user.teacher_profile %}
             <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>

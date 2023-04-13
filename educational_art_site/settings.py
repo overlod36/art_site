@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'educational_app.apps.EducationalAppConfig',
     'users.apps.UsersConfig',
     'crispy_forms',
+    'extra_views',
     'informing_app.apps.InformingAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -117,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 

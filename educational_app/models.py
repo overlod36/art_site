@@ -1,12 +1,15 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from users.models import Teacher_Profile, Study_Group, Student_Profile
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch.dispatcher import receiver
 import os
 import shutil
 from pathlib import Path
 from . import file_methods
+from educational_art_site.choices import *
+import datetime
+from django.core.exceptions import ValidationError
 
 class Course(models.Model):
     title = models.CharField(verbose_name='Название дисциплины', max_length=50)
@@ -35,19 +38,26 @@ class Lecture(models.Model):
 
 class Test(models.Model):
     name = models.CharField(verbose_name='Название теста', max_length=50, blank=False)
-    # duration = models.DurationField(verbose_name='Длительность теста')
-    # expiration_date = models.DateTimeField(verbose_name='Срок сдачи')
+    duration = models.DurationField(verbose_name='Длительность теста')
+    expiration_date = models.DateTimeField(verbose_name='Срок сдачи')
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
+    status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
 
     @property
     def filepath(self):
         return str(self.file.path)
+    
+    def save(self, *args, **kwargs):
+        if self.expiration_date < datetime.datetime.today():
+            raise ValidationError("Неправильная дата окончания теста!")
+        super(Test, self).save(*args, **kwargs)
 
 class Test_Attempt(models.Model):
     test = models.ForeignKey(Test, null=False, verbose_name='Тест', on_delete=models.CASCADE)
     student = models.ForeignKey(Student_Profile, null=False, verbose_name='Студент', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_attempt_file_path, null=False, validators=[FileExtensionValidator(['json'])])
+    status = models.CharField(verbose_name="Статус решения теста", max_length=50, choices=TEST_ATTEMPT_STATUS)
 
     @property
     def filepath(self):
@@ -73,3 +83,19 @@ def delete_test_file(sender, instance, *args, **kwargs):
 @receiver(pre_delete, sender=Test_Attempt)
 def delete_test_attempt_file(sender, instance, *args, **kwargs):
     if instance.file: instance.file.delete()
+
+@receiver(pre_save, sender=Test)
+def update_test(sender, instance, *args, **kwargs):
+    if not instance._state.adding:
+        if sender.objects.get(id=instance.id).name !=  instance.name:
+            base_path = os.path.join(file_methods.PATH, 'content', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests')
+            os.rename(os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name), f'{file_methods.get_transliteration(sender.objects.get(id=instance.id).name)}.json'), 
+                      os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name), f'{file_methods.get_transliteration(instance.name)}.json'))
+            os.rename(os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name)), os.path.join(base_path, file_methods.get_transliteration(instance.name)))
+            instance.file = os.path.join("%s" % instance.course.code_name, 'tests', file_methods.get_transliteration(instance.name), f'{file_methods.get_transliteration(instance.name)}.json')
+        if sender.objects.get(id=instance.id).duration !=  instance.duration:
+            print(instance.duration)
+
+@receiver(post_save, sender=Lecture)
+def lecture_announce(sender, instance, created, *args, **kwargs):
+    if created: pass

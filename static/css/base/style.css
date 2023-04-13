@@ -59,3 +59,13 @@
 .announces em{
     white-space: pre-line;
 }
+
+.lec-button-trash{
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 17px;
+    border-radius: 8px;
+    font-size: 17px;
+    margin-left: 15px;
+}
