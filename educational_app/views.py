@@ -9,12 +9,12 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Course, Lecture, Test
+from .models import Course, Lecture, Test, Test_Attempt
 from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
-from users.models import Teacher_Profile
+from users.models import Teacher_Profile, Student_Profile
 from .decorators import check_course_existence, course_access, check_test_existence
-from .forms import QuizShowForm, QuizUpdateForm
+from .forms import QuizShowForm, QuizUpdateForm, QuizPublishForm
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -91,17 +91,23 @@ def get_test(request, id):
     if hasattr(request.user, 'student_profile'):
         if test.status == "PROCESS":
             return HttpResponse(status=400)
+        if 'CHECK' in [at[0] for at in Test_Attempt.objects.filter(student=request.user.student_profile).filter(test=test).values_list('status')]:
+            return redirect('course-view', id=test.course.pk)
         form = QuizShowForm(questions=test_f['questions'])
         temp = 'educational/test.html'
         context = {'form': form}
     elif hasattr(request.user, 'teacher_profile'):
         if test.status == "PROCESS":
+            publish_check = QuizPublishForm()
             form = QuizUpdateForm(instance=test)
             temp = 'educational/test_update.html'
-            context = {'form': form, 'questions': test_f['questions']}
+            context = {'form': form, 'publish': publish_check,
+                       'questions': test_f['questions'], 'id': test.pk}
         else:
-            return redirect('course-view', id=test.course.pk)
-            # выводить список студентов
+            context = {'students':[]}
+            temp = 'educational/test_list.html'
+            students = Student_Profile.objects.filter(group__in=test.course.groups.all())
+            for st in students: context['students'].append([f'{st.first_name} {st.last_name}', Test_Attempt.objects.filter(student=st).filter(test=test)])
 
     if request.method == 'POST':
         if 'quiz_show' in request.POST:
@@ -111,13 +117,16 @@ def get_test(request, id):
             test_list = test_methods.test_dict_to_list(test_f['questions'])
             total_points = sum([question[2] for question in test_list])
             solution = test_methods.generate_solution_file(test_list, test_methods.solution_dict_to_list(res))
-            form.save(solution, request.user, test, "CHECK")
+            form.save(solution, request.user, test)
             res_points = sum([solution[ans][1] for ans in solution])
             return render(request, 'educational/test_res.html', {'res': res_points, 'total': total_points})
+        elif 'publish_st' in request.POST:
+            test.status = 'DONE'
+            test.save()
+            return redirect('course-view', id=test.course.pk)
         else:
             edit_form = QuizUpdateForm(request.POST, instance=test)
             if edit_form.is_valid():
-                # изменение имени папок (промежуточное сохранение имени папки, изменение имени)
                 edit_form.save()
                 return redirect('test', id=id)
             

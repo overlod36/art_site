@@ -1,0 +1,13 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+
+    {% for student in students %}
+        {{ student.0 }} 
+        {% for at in student.1 %}
+            {{ at.publish_date|time:"H:i" }} {{ at.publish_date|date:"SHORT_DATE_FORMAT" }} {{ at.get_status_display }}
+        {% endfor %}
+        <p></p>
+    {% endfor %}
+
+{% endblock content %}

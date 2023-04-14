@@ -39,7 +39,6 @@ class Lecture(models.Model):
 class Test(models.Model):
     name = models.CharField(verbose_name='Название теста', max_length=50, blank=False)
     duration = models.DurationField(verbose_name='Длительность теста')
-    expiration_date = models.DateTimeField(verbose_name='Срок сдачи')
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
     status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
@@ -48,16 +47,17 @@ class Test(models.Model):
     def filepath(self):
         return str(self.file.path)
     
-    def save(self, *args, **kwargs):
-        if self.expiration_date < datetime.datetime.today():
-            raise ValidationError("Неправильная дата окончания теста!")
-        super(Test, self).save(*args, **kwargs)
-
 class Test_Attempt(models.Model):
     test = models.ForeignKey(Test, null=False, verbose_name='Тест', on_delete=models.CASCADE)
     student = models.ForeignKey(Student_Profile, null=False, verbose_name='Студент', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_attempt_file_path, null=False, validators=[FileExtensionValidator(['json'])])
     status = models.CharField(verbose_name="Статус решения теста", max_length=50, choices=TEST_ATTEMPT_STATUS)
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата попытки')
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.status = "CHECK"
+        super(Test_Attempt, self).save(*args, **kwargs)
 
     @property
     def filepath(self):

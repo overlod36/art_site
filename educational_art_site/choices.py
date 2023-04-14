@@ -1,11 +1,13 @@
 TEST_STATUS = (
     ("PROCESS", "В процессе"),
-    ("DONE", "Завершено")
+    ("DONE", "Завершено"),
+    ("CLOSED", "Закрыт")
 )
 
 TASK_STATUS = (
     ("PROCESS", "В процессе"),
-    ("DONE", "Завершено")
+    ("DONE", "Завершено"),
+    ("CLOSED", "Закрыт")
 )
 
 TASK_ATTEMPT_STATUS = (

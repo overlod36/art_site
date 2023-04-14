@@ -41,6 +41,9 @@ class QuizUpdateForm(ModelForm):
     
     class Meta:
         model = Test
-        fields = ['name', 'duration', 'expiration_date', 'status']
-        widgets = {'duration': forms.widgets.TimeInput(attrs={'type': 'time'}), 'expiration_date': forms.widgets.DateTimeInput(attrs={"type": "datetime-local"})}
+        fields = ['name', 'duration']
+        widgets = {'duration': forms.widgets.TimeInput(attrs={'type': 'time'})}
+
+class QuizPublishForm(Form):
+    publish_st = forms.CharField(widget=forms.HiddenInput)
 

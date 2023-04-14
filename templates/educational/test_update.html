@@ -1,4 +1,5 @@
 {% extends "base_app/base.html" %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="content-section">
@@ -13,9 +14,16 @@
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Изменить</button>
             </div>
-            {% for q in questions %}
-                <div class="test-q"> Вопрос {{ q.text }} Количество баллов {{q.mark}} Правильный ответ {{q.answer}}</div>
-            {% endfor %}
         </form>
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ publish }}
+            </fieldset>
+            <button class="button-password" type="submit" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/check-mark-3-16.png' %}" alt="">Опубликовать тест</button>
+        </form>
+        {% for q in questions %}
+            <div class="test-q"> Вопрос {{ q.text }} Количество баллов {{q.mark}} Правильный ответ {{q.answer}}</div>
+        {% endfor %}
     </div>
 {% endblock content %}
