@@ -8,5 +8,6 @@ urlpatterns = [
     path('lecture/<int:id>', views.get_lecture, name='download-lec'),
     path('course/delete/<pk>', views.LectureDeleteView.as_view(), name='lecture-delete'),
     path('course/<int:id>/upload/lecture', views.LectureCreateView.as_view(), name='lecture-upload'),
-    path('test/<int:id>', views.get_test, name='test')
+    path('test/<int:id>', views.get_test, name='test'),
+    path('test-attempt/<int:id>', views.get_test_attempt, name='test-attempt')
 ]

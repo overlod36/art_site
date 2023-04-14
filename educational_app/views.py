@@ -91,7 +91,8 @@ def get_test(request, id):
     if hasattr(request.user, 'student_profile'):
         if test.status == "PROCESS":
             return HttpResponse(status=400)
-        if 'CHECK' in [at[0] for at in Test_Attempt.objects.filter(student=request.user.student_profile).filter(test=test).values_list('status')]:
+        ta_check = [at[0] for at in Test_Attempt.objects.filter(student=request.user.student_profile).filter(test=test).values_list('status')]
+        if 'CHECK' in ta_check or 'ACCESS' in ta_check:
             return redirect('course-view', id=test.course.pk)
         form = QuizShowForm(questions=test_f['questions'])
         temp = 'educational/test.html'
@@ -107,7 +108,7 @@ def get_test(request, id):
             context = {'students':[]}
             temp = 'educational/test_list.html'
             students = Student_Profile.objects.filter(group__in=test.course.groups.all())
-            for st in students: context['students'].append([f'{st.first_name} {st.last_name}', Test_Attempt.objects.filter(student=st).filter(test=test)])
+            for st in students: context['students'].append([f'{st.first_name} {st.last_name}', Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date')])
 
     if request.method == 'POST':
         if 'quiz_show' in request.POST:
@@ -129,8 +130,6 @@ def get_test(request, id):
             if edit_form.is_valid():
                 edit_form.save()
                 return redirect('test', id=id)
-            
-
     return render(request, temp, context)
 
 @login_required(login_url='/login/')
@@ -140,4 +139,10 @@ def get_lecture(request, id):
     resp['Content-Disposition'] = f'attachment; filename="{ lecture.filename }"'
     return resp
 
+@login_required(login_url='/login/')
+def get_test_attempt(request, id):
+    test_attempt = Test_Attempt.objects.get(pk=id)
+    with open(test_attempt.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
+        test_at = json.load(json_file)
+    return render(request, 'educational/test_attempt.html', context={'attempt': test_at})
 
