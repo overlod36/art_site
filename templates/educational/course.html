@@ -41,9 +41,23 @@
         {% endif %}
         <p></p>
         <h3>Тесты</h3>
-        {% for test in tests %}
-            <a href="{% url 'test' test.pk %}">{{ test.name }}</a>
-        {% endfor %}
+        {% if request.user.student_profile %}
+            {% for test in tests %}
+                {% if test.status == 'DONE' %}
+                    <a href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                {% endif %}
+            {% endfor %}
+        {% elif request.user.teacher_profile %}
+            {% for test in tests %}
+                {% if test.status == 'PROCESS' %}
+                    <a class="test-status-process" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                {% elif test.status == 'DONE' %}
+                    <a class="test-status-done" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                {% elif test.status == 'CLOSED' %}
+                    <a class="test-status-closed" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                {% endif %}
+            {% endfor %}   
+        {% endif %}
     </div>
 
 {% endblock content %}

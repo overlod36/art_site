@@ -108,3 +108,47 @@
     line-height: 40px;
     border-radius: 10px;
 }
+
+.test-status-process{
+    display: inline-block;
+    color: rgb(22, 22, 22);
+    text-decoration: none;
+    height: 40px; /*sets height of element*/
+    background: rgb(237, 115, 27); /*sets the background of this element (here a solid colour)*/
+    transition: all 0.6s; /*sets a transition (for hover effect)*/
+    padding-left: 20px; /*sets 'padding'*/
+    padding-right: 20px; /*sets 'padding'*/
+    line-height: 40px;
+    border-radius: 10px;
+}
+
+.test-status-done{
+    display: inline-block;
+    color: rgb(22, 22, 22);
+    text-decoration: none;
+    height: 40px; /*sets height of element*/
+    background: rgb(65, 237, 27); /*sets the background of this element (here a solid colour)*/
+    transition: all 0.6s; /*sets a transition (for hover effect)*/
+    padding-left: 20px; /*sets 'padding'*/
+    padding-right: 20px; /*sets 'padding'*/
+    line-height: 40px;
+    border-radius: 10px;
+}
+
+.test-status-closed{
+    display: inline-block;
+    color: rgb(22, 22, 22);
+    text-decoration: none;
+    height: 40px; /*sets height of element*/
+    background: rgb(125, 124, 123); /*sets the background of this element (here a solid colour)*/
+    transition: all 0.6s; /*sets a transition (for hover effect)*/
+    padding-left: 20px; /*sets 'padding'*/
+    padding-right: 20px; /*sets 'padding'*/
+    line-height: 40px;
+    border-radius: 10px;
+}
+
+.ans-input{
+    width: 40px;
+    text-align: right;
+}

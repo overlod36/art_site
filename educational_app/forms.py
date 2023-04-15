@@ -5,6 +5,7 @@ from django.core.files import File
 import json
 import os
 from . import file_methods
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class QuizShowForm(Form):
 
@@ -47,3 +48,13 @@ class QuizUpdateForm(ModelForm):
 class QuizPublishForm(Form):
     publish_st = forms.CharField(widget=forms.HiddenInput)
 
+class QuizAttemptCheckForm(Form):
+    def __init__(self, attempt, *args, **kwargs):
+        super(QuizAttemptCheckForm, self).__init__(*args, **kwargs)
+        counter = 0
+        for ans in attempt:
+            counter += 1
+            # validators=[MinValueValidator(0), MaxValueValidator(attempt[ans][1])]
+            self.fields[f'Answer{counter}'] = forms.IntegerField(label="", initial=attempt[ans][1])
+            self.fields[f'Answer{counter}'].widget.attrs['class'] = 'ans-input'
+    

@@ -17,4 +17,7 @@ def generate_solution_file(test: list, solution: list):
             case 'A':
                 if int(solution[i][0]) == test[i][0]: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], test[i][2]]
                 else: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], 0]
-    return res    
+    return res
+
+def get_test_attempt_list(dc: dict):
+    return [[key, dc[key][0]] for key in dc]

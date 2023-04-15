@@ -1,7 +1,22 @@
 {% extends "base_app/base.html" %}
+{% load test_show %}
 {% load static %}
 {% block content %}
 
-    {{ attempt }}
-
+<form method="POST">
+    {% csrf_token %}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Проверка теста</legend>
+        {% for field in form %}
+            <div class="test-attempt-f">
+                <a> Вопрос №{{forloop.counter}}: {{ ats|get_index:forloop.counter0|get_index:0 }} </a> 
+                <p></p>
+                <a> Ответ: {{ ats|get_index:forloop.counter0|get_index:1 }}</a>{{ field }}
+            </div>
+        {% endfor %}
+    </fieldset>
+    <div class="form-group">
+        <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Подтвердить</button>
+    </div>
+</form>
 {% endblock %}
