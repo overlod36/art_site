@@ -14,7 +14,7 @@ from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile, Student_Profile
 from .decorators import check_course_existence, course_access, check_test_existence
-from .forms import QuizShowForm, QuizUpdateForm, QuizPublishForm, QuizAttemptCheckForm
+from .forms import QuizShowForm, QuizUpdateForm, QuizPublishForm, QuizAttemptCheckForm, QuizAttemptDeniedForm
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -145,7 +145,10 @@ def get_test_attempt(request, id):
     with open(test_attempt.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
         test_at = json.load(json_file)
     if request.method == 'POST':
-        print(request.POST)
-    return render(request, 'educational/test_attempt.html', context={'form': QuizAttemptCheckForm(test_at), 
+        if 'denied_st' in request.POST:
+            print('Отказ')
+        else: print(request.POST)
+    return render(request, 'educational/test_attempt.html', context={'form': QuizAttemptCheckForm(test_at),
+                                                                     'denied': QuizAttemptDeniedForm(), 
                                                                      'ats': test_methods.get_test_attempt_list(test_at)})
 

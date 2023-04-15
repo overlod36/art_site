@@ -54,7 +54,11 @@ class QuizAttemptCheckForm(Form):
         counter = 0
         for ans in attempt:
             counter += 1
-            # validators=[MinValueValidator(0), MaxValueValidator(attempt[ans][1])]
             self.fields[f'Answer{counter}'] = forms.IntegerField(label="", initial=attempt[ans][1])
             self.fields[f'Answer{counter}'].widget.attrs['class'] = 'ans-input'
+            self.fields[f'Answer{counter}'].widget.attrs['max'] = attempt[ans][1]
+            self.fields[f'Answer{counter}'].widget.attrs['min'] = 0
+
+class QuizAttemptDeniedForm(Form):
+    denied_st = forms.CharField(widget=forms.HiddenInput)
     
