@@ -56,7 +56,7 @@ class QuizAttemptCheckForm(Form):
             counter += 1
             self.fields[f'Answer{counter}'] = forms.IntegerField(label="", initial=attempt[ans][1])
             self.fields[f'Answer{counter}'].widget.attrs['class'] = 'ans-input'
-            self.fields[f'Answer{counter}'].widget.attrs['max'] = attempt[ans][1]
+            self.fields[f'Answer{counter}'].widget.attrs['max'] = attempt[ans][2]
             self.fields[f'Answer{counter}'].widget.attrs['min'] = 0
 
 class QuizAttemptDeniedForm(Form):

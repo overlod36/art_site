@@ -142,13 +142,17 @@ def get_lecture(request, id):
 @login_required(login_url='/login/')
 def get_test_attempt(request, id):
     test_attempt = Test_Attempt.objects.get(pk=id)
+    test = test_attempt.test
     with open(test_attempt.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
         test_at = json.load(json_file)
+    with open(test.filepath, encoding='utf-8') as json_file:
+        test_f = json.load(json_file)
+    print(test_f)
     if request.method == 'POST':
         if 'denied_st' in request.POST:
             print('Отказ')
         else: print(request.POST)
     return render(request, 'educational/test_attempt.html', context={'form': QuizAttemptCheckForm(test_at),
                                                                      'denied': QuizAttemptDeniedForm(), 
-                                                                     'ats': test_methods.get_test_attempt_list(test_at)})
+                                                                     'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])})
 
