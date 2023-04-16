@@ -44,7 +44,7 @@
         {% if request.user.student_profile %}
             {% for test in tests %}
                 {% if test.status == 'DONE' %}
-                    <a href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.name }}</a>
                 {% endif %}
             {% endfor %}
         {% elif request.user.teacher_profile %}
@@ -52,7 +52,7 @@
                 {% if test.status == 'PROCESS' %}
                     <a class="test-status-process" href="{% url 'test' test.pk %}">{{ test.name }}</a>
                 {% elif test.status == 'DONE' %}
-                    <a class="test-status-done" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                    <a class="test-status-done" href="{% url 'test' test.pk %}">  {{ test.name }}</a>
                 {% elif test.status == 'CLOSED' %}
                     <a class="test-status-closed" href="{% url 'test' test.pk %}">{{ test.name }}</a>
                 {% endif %}

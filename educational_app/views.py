@@ -19,6 +19,9 @@ from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
 from . import test_methods
+from . import file_methods
+import os
+from django.core.files import File
 
 class LectureCreateView(LoginRequiredMixin, CreateView):
     model = Lecture
@@ -147,12 +150,34 @@ def get_test_attempt(request, id):
         test_at = json.load(json_file)
     with open(test.filepath, encoding='utf-8') as json_file:
         test_f = json.load(json_file)
-    print(test_f)
+    if test_attempt.status == 'CHECK': 
+        temp = 'educational/test_attempt_check.html'
+        context={'form': QuizAttemptCheckForm(test_at),
+                 'denied': QuizAttemptDeniedForm(), 
+                 'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])}
+    else: 
+        temp = 'educational/test_attempt.html'
+        context={'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])}
+
     if request.method == 'POST':
         if 'denied_st' in request.POST:
-            print('Отказ')
-        else: print(request.POST)
-    return render(request, 'educational/test_attempt.html', context={'form': QuizAttemptCheckForm(test_at),
-                                                                     'denied': QuizAttemptDeniedForm(), 
-                                                                     'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])})
+            test_attempt.status = 'DENIED'
+            test_attempt.save()
+            return redirect('test', id=test.pk)
+        else:
+            res = [int(value[0]) for key, value in dict(request.POST).items() if key != 'csrfmiddlewaretoken']
+            interm_file_path = os.path.join(file_methods.PATH, 'intermediate_content', 
+                              f'{file_methods.get_transliteration(test.name)}.json')
+            f = open(interm_file_path, 'a+', encoding='utf-8')
+            res_str = json.dumps(test_methods.set_test_attempt(test_at, res), indent = 2, ensure_ascii=False)
+            f.write(res_str)
+            test_attempt.file.delete()
+            test_attempt.file = File(f)
+            test_attempt.status = 'ACCESS'
+            test_attempt.save(update_fields=['file', 'status'])
+            f.close()
+            os.remove(interm_file_path)
+            return redirect('test', id=test.pk)
+
+    return render(request, temp, context)
 

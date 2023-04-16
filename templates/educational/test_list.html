@@ -15,9 +15,9 @@
                 {% if at.status == 'CHECK' %}
                     <a href="{% url 'test-attempt' at.pk %}" class="ta-status-check">{{ at.get_status_display }}</a>
                 {% elif at.status == 'ACCESS' %}
-                    <a class="ta-status-done">{{ at.get_status_display }}</a>
+                    <a href="{% url 'test-attempt' at.pk %}" class="ta-status-done">{{ at.get_status_display }}</a>
                 {% elif at.status == 'DENIED' %}
-                    <a class="ta-status-denied">{{ at.get_status_display }}</a>
+                    <a href="{% url 'test-attempt' at.pk %}" class="ta-status-denied">{{ at.get_status_display }}</a>
                 {% endif %}
             {% endfor %}
         {% endif %}

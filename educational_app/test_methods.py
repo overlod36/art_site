@@ -20,4 +20,11 @@ def generate_solution_file(test: list, solution: list):
     return res
 
 def get_test_attempt_list(dc: dict, q: list):
-    return [[key, val[0], el['mark'], el['answer']] if not el['type'] == 'AO' else [key, val[0], el['mark'], el['choices'][el['answer']-1]] for (key, val), el in zip(dc.items(), q)]
+    return [[key, val[0], el['mark'], el['answer'], val[1]] if not el['type'] == 'AO' else [key, val[0], el['mark'], el['choices'][el['answer']-1], val[1]] for (key, val), el in zip(dc.items(), q)]
+
+def set_test_attempt(attempt: dict, points: list):
+    i = 0
+    for key in attempt:
+        attempt[key][1] = points[i]
+        i += 1
+    return attempt

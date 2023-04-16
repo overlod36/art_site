@@ -1,0 +1,34 @@
+{% extends "base_app/base.html" %}
+{% load test_show %}
+{% load static %}
+{% block content %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Проверка теста</legend>
+            {% for field in form %}
+                <div class="test-attempt-f">
+                    <a> Вопрос №{{forloop.counter}}: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:0 }} </a> 
+                    <p></p>
+                    <a> Ответ: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:1 }}</a>
+                    <br/>
+                    <a> Правильный ответ: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:3 }} </a>
+                    <br/>
+                    <a> Максимальное количество баллов: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:2 }} </a> {{ field }}
+                    <p></p>
+                </div>
+            {% endfor %}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Принять решение</button>
+        </div>
+    </form>
+    <form method="POST">
+        {% csrf_token %}
+        {{ denied }}
+        <div class="form-group">
+            <button class="btn btn-outline-danger" type="submit" style="margin-bottom: 50px">Отклонить решение</button>
+        </div>
+    </form>
+{% endblock %}
