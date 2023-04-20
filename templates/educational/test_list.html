@@ -24,4 +24,7 @@
         <p></p>
     {% endfor %}
 
+    {% if test.status != 'CLOSED' %}
+        <a href="{% url 'test-close' test.pk %}"><button class="button-password">Закрыть тест</button></a>
+    {% endif %}
 {% endblock content %}

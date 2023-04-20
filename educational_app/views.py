@@ -9,7 +9,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Course, Lecture, Test, Test_Attempt
+from .models import Course, Lecture, Test, Test_Attempt, Test_Mark
 from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile, Student_Profile
@@ -92,7 +92,7 @@ def get_test(request, id):
         test_f = json.load(json_file)
     
     if hasattr(request.user, 'student_profile'):
-        if test.status == "PROCESS":
+        if test.status == "PROCESS" or test.status == "CLOSED":
             return HttpResponse(status=400)
         ta_check = [at[0] for at in Test_Attempt.objects.filter(student=request.user.student_profile).filter(test=test).values_list('status')]
         if 'CHECK' in ta_check or 'ACCESS' in ta_check:
@@ -108,7 +108,7 @@ def get_test(request, id):
             context = {'form': form, 'publish': publish_check,
                        'questions': test_f['questions'], 'id': test.pk}
         else:
-            context = {'students':[]}
+            context = {'students':[], 'test':test}
             temp = 'educational/test_list.html'
             students = Student_Profile.objects.filter(group__in=test.course.groups.all())
             for st in students: context['students'].append([f'{st.first_name} {st.last_name}', Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date')])
@@ -177,7 +177,48 @@ def get_test_attempt(request, id):
             test_attempt.save(update_fields=['file', 'status'])
             f.close()
             os.remove(interm_file_path)
+            test_mark = Test_Mark(test=test, test_attempt=test_attempt, 
+                                  student=test_attempt.student, 
+                                  points=test_methods.get_test_attempt_points(test_at),
+                                  max_points=test_methods.get_test_points(test_f))
+            test_mark.save()
             return redirect('test', id=test.pk)
 
     return render(request, temp, context)
 
+@login_required(login_url='/login/')
+def close_test(request, id):
+    test = Test.objects.get(pk=id)
+    with open(test.filepath, encoding='utf-8') as json_file:
+        test_f = json.load(json_file)
+    if request.method == 'POST':
+        res=[]
+        for st in Student_Profile.objects.filter(group__in=test.course.groups.all()): 
+            if not Test_Attempt.objects.filter(student=st).filter(test=test):
+                test_mark = Test_Mark(test=test, student=st, 
+                                      points=0, max_points=test_methods.get_test_points(test_f))
+                test_mark.save()
+            else:
+                match Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date').last().status:
+                    case 'ACCESS':
+                        continue
+                    case 'DENIED':
+                        test_mark = Test_Mark(test=test, student=st, 
+                                      points=0, max_points=test_methods.get_test_points(test_f))
+                        test_mark.save()
+                    case 'CHECK':
+                        ta = Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date').last()
+                        with open(ta.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
+                            test_at = json.load(json_file)
+                        ta.status = 'ACCESS'
+                        ta.save()
+                        test_mark = Test_Mark(test=test, test_attempt=ta, 
+                                  student=st, 
+                                  points=test_methods.get_test_attempt_points(test_at),
+                                  max_points=test_methods.get_test_points(test_f))
+                        test_mark.save()
+        test.status = 'CLOSED'
+        test.save()      
+        return redirect('course-view', id=test.course.pk)
+
+    return render(request, 'educational/test_close.html', context={'test': test})

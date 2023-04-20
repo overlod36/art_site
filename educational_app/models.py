@@ -55,13 +55,24 @@ class Test_Attempt(models.Model):
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата попытки')
 
     def save(self, *args, **kwargs):
-        if self._state.adding:
-            self.status = "CHECK"
+        if self._state.adding: self.status = "CHECK"
         super(Test_Attempt, self).save(*args, **kwargs)
 
     @property
     def filepath(self):
         return str(self.file.path)
+
+class Mark(models.Model):
+    points = models.PositiveIntegerField()
+    max_points = models.PositiveIntegerField()
+    student = models.ForeignKey(Student_Profile, null=False, verbose_name='Студент', on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+class Test_Mark(Mark):
+    test = models.ForeignKey(Test, null=False, verbose_name='Тест', on_delete=models.CASCADE)
+    test_attempt = models.OneToOneField(Test_Attempt, null=True, verbose_name='Попытка выполнения теста', on_delete=models.CASCADE)
 
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):

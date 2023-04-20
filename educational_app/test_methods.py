@@ -28,3 +28,9 @@ def set_test_attempt(attempt: dict, points: list):
         attempt[key][1] = points[i]
         i += 1
     return attempt
+
+def get_test_points(dc: dict):
+    return sum([el['mark'] for el in dc['questions']])
+
+def get_test_attempt_points(dc: dict):
+    return sum(dc[el][1] for el in dc)
