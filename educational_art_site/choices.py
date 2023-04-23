@@ -21,3 +21,9 @@ TEST_ATTEMPT_STATUS = (
     ("DENIED", "Отказано"),
     ("ACCESS", "Принято")
 )
+
+STUDENT_GALLERY_VISIBILITY = (
+    ("PRIVATE", "Закрытый"),
+    ("INNER", "Внутренний"),
+    ("PUBLIC","Открытый")
+)
