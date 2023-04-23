@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import pre_delete, pre_save, post_save
+from django.dispatch.dispatcher import receiver
+import gallery_app.models
 
 class Study_Group(models.Model):
     number = models.PositiveIntegerField(verbose_name='Номер группы', unique=True)
@@ -29,3 +32,9 @@ class Student_Profile(Base_Profile):
 class Admin_Profile(Base_Profile):
     def __str__(self):
         return f'Администратор {self.user.username}'
+    
+@receiver(post_save, sender=Student_Profile)
+def create_gallery(sender, instance, created, *args, **kwargs):
+    if created:
+        gal = gallery_app.models.Student_Gallery(student=instance, status='PRIVATE')
+        gal.save()
