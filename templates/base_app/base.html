@@ -22,6 +22,8 @@
               {% if request.user.teacher_profile %}
                 <a class="nav-item nav-link" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt=""></a>
                 <a class="nav-item nav-link" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/ann.png' %}" alt=""></a>
+              {% elif request.user.student_profile %}
+                <a class="nav-item nav-link" href="{% url 'student-gallery' id=request.user.student_profile.student_gallery.pk %}"><img class="use-ico" src="{% static 'img/photo-24.png' %}" alt=""></a>
               {% elif request.user.admin_profile %}
                 {% if user.is_superuser %}
                   <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
