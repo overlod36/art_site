@@ -25,15 +25,15 @@ def get_transliteration(title):
 
 
 def get_lecture_file_path(instance, filename):
-    return os.path.join("%s" % instance.course.code_name, 'lectures', filename)
+    return os.path.join("%s" % 'educational_tapes', instance.course.code_name, 'lectures', filename)
 
 def get_test_file_path(instance, filename):
     filename = f'{get_transliteration(instance.name)}.json'
-    return os.path.join("%s" % instance.course.code_name, 'tests', get_transliteration(instance.name), filename)
+    return os.path.join("%s" % 'educational_tapes', instance.course.code_name, 'tests', get_transliteration(instance.name), filename)
 
 def get_test_attempt_file_path(instance, filename):
     filename = f'{instance.test.name}.json'
-    return os.path.join("%s" % instance.test.course.code_name, 'tests', get_transliteration(instance.test.name), instance.student.user.username, get_transliteration(filename))
+    return os.path.join("%s" % 'educational_tapes', instance.test.course.code_name, 'tests', get_transliteration(instance.test.name), instance.student.user.username, get_transliteration(filename))
 
 def remove_folder(path):
     if os.path.isdir(path): Path(os.path.join(path)).rmdir()

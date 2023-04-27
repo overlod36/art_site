@@ -21,9 +21,9 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         if not self.code_name:
             self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'lectures'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'tests'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', self.code_name, 'tasks'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'lectures'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tests'))
+        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tasks'))
         super(Course, self).save(*args, **kwargs)
     def __str__(self):
         return f"Курс: {self.title}, преподаватель: {self.author}"
@@ -80,7 +80,7 @@ def delete_lecture_file(sender, instance, *args, **kwargs):
 
 @receiver(pre_delete, sender=Course)
 def delete_course_folder(sender, instance, *args, **kwargs):
-    course_path = os.path.join(file_methods.PATH, 'content', instance.code_name)
+    course_path = os.path.join(file_methods.PATH, 'content', 'educational_tapes', instance.code_name)
     file_methods.remove_folder(os.path.join(course_path, 'lectures'))
     file_methods.remove_folder(os.path.join(course_path, 'tests'))
     file_methods.remove_folder(os.path.join(course_path, 'tasks'))
@@ -89,7 +89,7 @@ def delete_course_folder(sender, instance, *args, **kwargs):
 @receiver(pre_delete, sender=Test)
 def delete_test_file(sender, instance, *args, **kwargs):
     if instance.file: instance.file.delete()
-    file_methods.remove_tree(os.path.join(file_methods.PATH, 'content', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests', file_methods.get_transliteration(instance.name)))
+    file_methods.remove_tree(os.path.join(file_methods.PATH, 'content', 'educational_tapes', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests', file_methods.get_transliteration(instance.name)))
 
 @receiver(pre_delete, sender=Test_Attempt)
 def delete_test_attempt_file(sender, instance, *args, **kwargs):
@@ -99,11 +99,11 @@ def delete_test_attempt_file(sender, instance, *args, **kwargs):
 def update_test(sender, instance, *args, **kwargs):
     if not instance._state.adding:
         if sender.objects.get(id=instance.id).name !=  instance.name:
-            base_path = os.path.join(file_methods.PATH, 'content', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests')
+            base_path = os.path.join(file_methods.PATH, 'content', 'educational_tapes', file_methods.get_transliteration(getattr(instance.course, 'title')), 'tests')
             os.rename(os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name), f'{file_methods.get_transliteration(sender.objects.get(id=instance.id).name)}.json'), 
                       os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name), f'{file_methods.get_transliteration(instance.name)}.json'))
             os.rename(os.path.join(base_path, file_methods.get_transliteration(sender.objects.get(id=instance.id).name)), os.path.join(base_path, file_methods.get_transliteration(instance.name)))
-            instance.file = os.path.join("%s" % instance.course.code_name, 'tests', file_methods.get_transliteration(instance.name), f'{file_methods.get_transliteration(instance.name)}.json')
+            instance.file = os.path.join("%s" % 'educational_tapes', instance.course.code_name, 'tests', file_methods.get_transliteration(instance.name), f'{file_methods.get_transliteration(instance.name)}.json')
         if sender.objects.get(id=instance.id).duration !=  instance.duration:
             print(instance.duration)
 

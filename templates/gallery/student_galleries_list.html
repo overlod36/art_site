@@ -1,0 +1,9 @@
+{% extends "base_app/base.html" %}
+{% block content %}
+
+{% for gal in st_galleries %}
+    <a href="{% url 'student-gallery' gal.pk %}">{{gal}}</a>
+    <br/>
+{% endfor %}
+
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+
+{{ gallery.title }}
+<p></p>
+<a href="{% url 'pic-load' id=gallery.pk %}"><button class="button-img"><img class="danger-ico" src="{% static 'img/slr-camera-16.png' %}" alt="">Загрузить изображение</button></a>
+<p></p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <div class="form-group">
+        <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Изменить</button>
+    </div>
+</form>
+<p></p>
+<div class="row">
+    {% for img in images %}
+        <div class="col-4">
+            <img class="gallery-img-show" src="{{ img.student_img.url }}"/>
+            <br/>
+            <a> Описание: {{ img.description }} </a>
+        </div>
+    {% endfor %}
+  </div>
+{% endblock content %}
