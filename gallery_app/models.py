@@ -52,3 +52,7 @@ class Teacher_Picture(Base_Picture):
 @receiver(post_save, sender=Student_Gallery)
 def st_gallery_folder(sender, instance, created, *args, **kwargs):
     if created: file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'student_galleries', f'{instance.student.user.username}'))
+
+@receiver(pre_delete, sender=Student_Picture)
+def st_pic_delete(sender, instance, *args, **kwargs):
+    if instance.student_img: instance.student_img.delete()

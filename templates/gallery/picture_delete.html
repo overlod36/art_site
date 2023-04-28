@@ -1,0 +1,12 @@
+{% extends "base_app/base.html" %}
+{% block content %}
+
+<p>Вы действительно хотите удалить изображение?</p>
+<form action="" method="POST">
+    {% csrf_token %}
+    <a href="{% url 'main' %}">Отмена</a>
+    <input type="submit" name="Confirm" value="Подтвердить">
+
+</form>
+
+{% endblock content %}

@@ -15,12 +15,19 @@
 </form>
 <p></p>
 <div class="row">
-    {% for img in images %}
-        <div class="col-4">
-            <img class="gallery-img-show" src="{{ img.student_img.url }}"/>
-            <br/>
-            <a> Описание: {{ img.description }} </a>
-        </div>
-    {% endfor %}
-  </div>
+    {% if not content %}
+        <a>Здесь пока ничего нет</a>
+    {% else %}
+        {% for img in content %}
+            <div class="col-4">
+                <img class="gallery-img-show" src="{{ img.student_img.url }}"/>
+                <br/>
+                <a> Описание: {{ img.description }} </a>
+                <a href="{% url 'st-pic-del' img.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<p></p>
+{% include "base_app/fb_pagination.html" %}
 {% endblock content %}

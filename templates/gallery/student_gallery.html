@@ -4,13 +4,18 @@
 
 {{ gallery.title }}
 
-<div class="row">
-    {% for img in images %}
-        <div class="col-4">
-            <img class="gallery-img-show" src="{{ img.student_img.url }}"/>
-            <br/>
-            <a> Описание: {{ img.description }} </a>
-        </div>
-    {% endfor %}
+  <div class="row">
+    {% if not content %}
+        <a>Здесь пока ничего нет</a>
+    {% else %}
+        {% for img in content %}
+            <div class="col-4">
+                <img class="gallery-img-show" src="{{ img.student_img.url }}"/>
+                <br/>
+                <a> Описание: {{ img.description }} </a>
+            </div>
+        {% endfor %}
+    {% endif %}
   </div>
+  {% include "base_app/fb_pagination.html" %}
 {% endblock content %}

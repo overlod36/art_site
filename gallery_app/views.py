@@ -15,11 +15,13 @@ from django.views.generic import (
 )
 from .forms import StudentGalleryStatusForm
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 class StudentGalleryListView(LoginRequiredMixin, ListView):
     model = Student_Gallery
     template_name = 'gallery/student_galleries_list.html'
     context_object_name = 'st_galleries'
+    paginate_by = 2
 
     def get_queryset(self) -> QuerySet[Any]:
         return Student_Gallery.objects.filter(Q(status='INNER') | Q(status='PUBLIC'))
@@ -45,13 +47,23 @@ class StudentPictureCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('main')
 
+class StudentPictureDeleteView(LoginRequiredMixin, DeleteView):
+    model = Student_Picture
+    template_name = 'gallery/picture_delete.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
 @login_required(login_url='/login/')
 def get_student_gallery(request, id):
-    # первичная проверка на студента (нужно для отображения формы)
+    page = request.GET.get('page', 1)
     gallery = Student_Gallery.objects.get(pk=id)
     images = Student_Picture.objects.filter(student_gallery=gallery) 
     form = StudentGalleryStatusForm(initial={'status': gallery.status})
-    context = {'gallery': gallery, 'images': images}
+    paginator = Paginator(images, per_page=2)
+    content = paginator.get_page(page)
+    # page_object = paginator.get_page(page)
+    context = {'content': content, 'images': images, 'gallery': gallery}
     template = 'gallery/student_gallery.html'
     if hasattr(request.user, 'student_profile'):
         if request.user.student_profile == gallery.student:

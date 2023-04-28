@@ -1,0 +1,30 @@
+<div class="pagi">
+    <span class="pagination">
+      {% if content.has_previous %}
+        <div class="page-item">
+          <a class="page-link" href="?page={{ content.previous_page_number }}">
+            Предыдущая страница
+          </a>
+        </div>
+      {% else %}
+        <div class="page-item disabled">
+          <a class="page-link" href="#">
+            Предыдущая страница
+          </a>
+        </div>
+      {% endif%}
+      {% if content.has_next %}
+        <div class="page-item">
+          <a class="page-link" href="?page={{ content.next_page_number }}">
+              Следующая страница
+          </a>
+        </div> 
+      {% else %}
+        <div class="page-item disabled">
+          <a class="page-link" href="#">
+            Следующая страница
+          </a>
+        </div>
+      {% endif%}
+    </span>
+  </div>
