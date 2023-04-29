@@ -3,7 +3,7 @@
 <div>
 {% for gal in st_galleries %}
     
-    <a href="{% url 'student-gallery' gal.pk %}">{{gal}}</a>
+    <a href="{% url 'student-gallery' gal.pk %}">{{gal}} {{gal.pictures_count}} изображений</a>
     <br/>
 {% endfor %}
 </div>

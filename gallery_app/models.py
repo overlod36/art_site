@@ -17,6 +17,10 @@ class Student_Gallery(Base_Gallery):
     student = models.OneToOneField(Student_Profile, on_delete=models.CASCADE)
     status = models.CharField(verbose_name="Видимость галереи", max_length=50, choices=STUDENT_GALLERY_VISIBILITY)
 
+    @property
+    def pictures_count(self):
+        return self.student_picture_set.all().count()
+
     def __str__(self):
         return f'Галерея студента {self.student.first_name} {self.student.last_name}'
 

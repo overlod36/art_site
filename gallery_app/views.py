@@ -60,7 +60,7 @@ def get_student_gallery(request, id):
     gallery = Student_Gallery.objects.get(pk=id)
     images = Student_Picture.objects.filter(student_gallery=gallery) 
     form = StudentGalleryStatusForm(initial={'status': gallery.status})
-    paginator = Paginator(images, per_page=2)
+    paginator = Paginator(images, per_page=3)
     content = paginator.get_page(page)
     # page_object = paginator.get_page(page)
     context = {'content': content, 'images': images, 'gallery': gallery}
