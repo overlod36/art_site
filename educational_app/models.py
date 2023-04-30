@@ -18,6 +18,11 @@ class Course(models.Model):
     groups = models.ManyToManyField(Study_Group, blank=True, verbose_name='Группы')
     description = models.TextField(verbose_name='Описание курса')
 
+    @property
+    def groups_list(self):
+        return self.groups.all()
+
+
     def save(self, *args, **kwargs):
         if not self.code_name:
             self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
@@ -42,6 +47,7 @@ class Test(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
     status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата теста')
 
     @property
     def filepath(self):
@@ -73,6 +79,10 @@ class Mark(models.Model):
 class Test_Mark(Mark):
     test = models.ForeignKey(Test, null=False, verbose_name='Тест', on_delete=models.CASCADE)
     test_attempt = models.OneToOneField(Test_Attempt, null=True, verbose_name='Попытка выполнения теста', on_delete=models.CASCADE)
+
+    @property
+    def percent(self):
+        return "%.1f" % ((self.points / self.max_points)* 100)  
 
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):

@@ -171,5 +171,8 @@
     margin-bottom:25px;
 }
 
+.gradebook-link{
+    text-decoration: none;
+}
 
 /* align-self:center (when div in display: flex) */

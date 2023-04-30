@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('course/new/', views.CourseCreateView.as_view(), name='course-create'),
     path('course/<int:id>', views.get_course, name='course-view'),
+    path('course/<int:id>/gradebook/<int:group_num>', views.get_course_gradebook, name='course-gradebook'),
     path('lecture/<int:id>', views.get_lecture, name='download-lec'),
     path('course/delete/<pk>', views.LectureDeleteView.as_view(), name='lecture-delete'),
     path('course/<int:id>/upload/lecture', views.LectureCreateView.as_view(), name='lecture-upload'),

@@ -7,6 +7,13 @@
         <h2> {{ course.title }} </h2>
         <p> {{ course.author }} </p>
         <p> Описание курса: {{ course.description }} </p>
+        {% if request.user.teacher_profile %}
+            {% for group in course.groups_list %}
+                <a class="gradebook-link" href="{% url 'course-gradebook' course.pk group.number %}"> <img class="use-ico" src="{% static 'img/magazine-32.png' %}" alt=""> Журнал группы {{ group.number }} </a>
+                <br/>
+            {% endfor %}
+        {% endif %}
+        <br/>
         <h3> Лекции </h3>
         {% for lec in lectures %}
             <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>

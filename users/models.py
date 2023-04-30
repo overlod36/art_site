@@ -7,6 +7,10 @@ import gallery_app.models
 class Study_Group(models.Model):
     number = models.PositiveIntegerField(verbose_name='Номер группы', unique=True)
 
+    @property
+    def ordered_students(self):
+        return self.student_profile_set.all().order_by('last_name')
+
     def __str__(self):
         return f'Группа {self.number}'
 

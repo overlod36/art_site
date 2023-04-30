@@ -12,7 +12,7 @@ from django.views.generic import (
 from .models import Course, Lecture, Test, Test_Attempt, Test_Mark
 from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
-from users.models import Teacher_Profile, Student_Profile
+from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
 from .forms import QuizShowForm, QuizUpdateForm, QuizPublishForm, QuizAttemptCheckForm, QuizAttemptDeniedForm
 from django.http import HttpRequest
@@ -22,6 +22,7 @@ from . import test_methods
 from . import file_methods
 import os
 from django.core.files import File
+from django.db.models import Sum
 
 class LectureCreateView(LoginRequiredMixin, CreateView):
     model = Lecture
@@ -222,3 +223,17 @@ def close_test(request, id):
         return redirect('course-view', id=test.course.pk)
 
     return render(request, 'educational/test_close.html', context={'test': test})
+
+@login_required(login_url='/login/')
+def get_course_gradebook(request, id, group_num):
+    group = Study_Group.objects.get(number=group_num)
+    # проверка
+    context = {'id': id, 'group': group}
+    context['tests'] = Test.objects.filter(status='CLOSED').order_by('publish_date')
+    context['students'] = [[student, 
+                            Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date'),
+                            Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'],
+                            Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum'],
+                            "%.1f" % ((Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'] / Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum']) * 100)] for student in group.ordered_students]
+    print(context['students'][0][2])
+    return render(request, 'educational/group_course_points.html', context)
