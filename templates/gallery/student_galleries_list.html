@@ -1,12 +1,24 @@
 {% extends "base_app/base.html" %}
+{% load plural %}
 {% block content %}
-<div>
-{% for gal in st_galleries %}
-    
-    <a href="{% url 'student-gallery' gal.pk %}">{{gal}} {{gal.pictures_count}} изображений</a>
-    <br/>
-{% endfor %}
-</div>
-{% include "base_app/clb_pagination.html" %}
+    <div class="st-galleries-page-content">
+        <div class="galleries-list container my-5">
+            <div class="row g-4">
+                {% for gal in st_galleries %}
+                    <div class="col-4 d-flex justify-content-center">
+                        <div class="gl-list-el">
+                            <div class="card h-100" style="width: 18rem;">
+                                <img class="card-img-top" src="{{ img.student_img.url }}"/>
+                                <div class="card-body">
+                                    <a href="{% url 'student-gallery' gal.pk %}">{{gal}} <br/> {{gal.pictures_count|plural:"изображение,изображения,изображений"}}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% include "base_app/clb_pagination.html" %}
+        </div>
+    </div>
 
 {% endblock content %}

@@ -168,11 +168,50 @@
     padding: 8px 14px;
     border-radius: 8px;
     font-size: 17px;
-    margin-bottom:25px;
 }
 
 .gradebook-link{
     text-decoration: none;
 }
 
-/* align-self:center (when div in display: flex) */
+.course-sidebar{
+    min-width: min-content;
+}
+
+.gradebook-page-content{
+    margin-top: 4vh;
+}
+
+.st-galleries-page-content{
+    margin: 4vh;
+}
+
+.galleries-list{
+    min-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.st-gallery-page-content{
+    margin-top: 4vh;
+}
+
+.gallery-content{
+    padding-top: 20px;
+    min-height: 77vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pagi{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.gl-list-el{
+    text-align: center;
+    text-decoration: none;
+}

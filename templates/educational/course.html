@@ -3,68 +3,151 @@
 {% load date_filter %}
 {% block content %}
 
-    <div class="course">
-        <h2> {{ course.title }} </h2>
-        <p> {{ course.author }} </p>
-        <p> Описание курса: {{ course.description }} </p>
-        {% if request.user.teacher_profile %}
-            {% for group in course.groups_list %}
-                <a class="gradebook-link" href="{% url 'course-gradebook' course.pk group.number %}"> <img class="use-ico" src="{% static 'img/magazine-32.png' %}" alt=""> Журнал группы {{ group.number }} </a>
-                <br/>
-            {% endfor %}
-        {% endif %}
-        <br/>
-        <h3> Лекции </h3>
-        {% for lec in lectures %}
-            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
-            <br/>
-            <p></p>
-            {% if request.user.teacher_profile %}
-                <a href="{% url 'lecture-delete' lec.pk %}"><button class="lec-button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-            {% endif %}
-            <p></p>
-        {% endfor %}
-        {% if request.user.teacher_profile %}
-            <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
-        {% endif %}
-        <h3>Объявления</h3>
-        <p></p>
-        {% for ann in announces %}
-            <h4> {{ ann.title }} </h4>
-            <em> Автор объявления: {{ ann.course.author }} </em>
-            <br/>
-            <em> Дисциплина: {{ ann.course.title }}</em>
-            <br/>
-            <em> Дата публикации: {{ ann.publish_date|format }} </em>
-            <p> {{ ann.text }} </p>
-            {% if request.user.teacher_profile %}
-                <a href="{% url 'delete-announce' id=ann.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-            {% endif %}
-            <hr class="featurette-divider">
-        {% endfor %}
-        <p></p>
-        {% if request.user.teacher_profile %}
-            <a href="{% url 'one-ann-create' course.pk %}"><button class="button-password" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/pencil-2-16.png' %}" alt="">Опубликовать объявление</button></a>
-        {% endif %}
-        <p></p>
-        <h3>Тесты</h3>
-        {% if request.user.student_profile %}
-            {% for test in tests %}
-                {% if test.status == 'DONE' %}
-                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.name }}</a>
+
+    <div class="row flex-nowrap">
+        <div class="course-sidebar col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <span class="fs-5 d-none d-sm-inline">{{ course.title }}</span>
+                </a>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-0">
+                            <i class="fs-4 bi-house"></i> <span id="bt-course-announces" class="ms-1 d-none d-sm-inline text-white">Объявления</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-0">
+                            <i class="fs-4 bi-house"></i> <span id="bt-course-lectures" class="ms-1 d-none d-sm-inline text-white">Лекции</span>
+                        </a>
+                    </li>
+                    {% if request.user.teacher_profile %}
+                        <li>
+                            <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fs-4 bi-speedometer2"></i> <span class="ms-1 d-none d-sm-inline text-white">Журналы групп</span> </a>
+                            <ul class="collapse show nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
+                                {% for group in course.groups_list %}
+                                    <li>
+                                        <a href="{% url 'course-gradebook' course.pk group.number %}" class="nav-link px-0"> <span class="ms-1 d-none d-sm-inline text-white">{{ group.number }}</span> </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-0">
+                            <i class="fs-4 bi-house"></i> <span id="bt-course-tests" class="ms-1 d-none d-sm-inline text-white">Тесты</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-0">
+                            <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Информация о курсе</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="course col py-3 px-4">
+            <div id="course-lectures" style="display:none;">
+                <h3>Лекции</h3>
+                {% if lectures %}
+                    {% for lec in lectures %}
+                        {% if lec.extension == '.pdf' %}
+                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
+                        {% elif lec.extension == '.doc' or lec.extension == '.docx' %}
+                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/word-3-32.png' %}" alt=""> {{ lec.filename }} </a>
+                        {% elif lec.extension == '.ppt' or lec.extension == '.pptx' %}
+                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/powerpoint-3-32.png' %}" alt=""> {{ lec.filename }} </a>
+                        {% else %}
+                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ lec.filename }} </a>
+                        {% endif %}
+                        <br/>
+                        <p></p>
+                        {% if request.user.teacher_profile %}
+                            <a href="{% url 'lecture-delete' lec.pk %}"><button class="lec-button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                        {% endif %}
+                        <p></p>
+                    {% endfor %}
+                {% else %}
+                    <a>Здесь пока ничего нет!</a>
                 {% endif %}
-            {% endfor %}
-        {% elif request.user.teacher_profile %}
-            {% for test in tests %}
-                {% if test.status == 'PROCESS' %}
-                    <a class="test-status-process" href="{% url 'test' test.pk %}">{{ test.name }}</a>
-                {% elif test.status == 'DONE' %}
-                    <a class="test-status-done" href="{% url 'test' test.pk %}">  {{ test.name }}</a>
-                {% elif test.status == 'CLOSED' %}
-                    <a class="test-status-closed" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                {% if request.user.teacher_profile %}
+                    <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
                 {% endif %}
-            {% endfor %}   
-        {% endif %}
+            </div>
+            <div id="course-announces" style="display:none;">
+                <h3>Объявления</h3>
+                {% if announces %}
+                    {% for ann in announces %}
+                        <h4> {{ ann.title }} </h4>
+                        <em> Автор объявления: {{ ann.course.author }} </em>
+                        <br/>
+                        <em> Дисциплина: {{ ann.course.title }}</em>
+                        <br/>
+                        <em> Дата публикации: {{ ann.publish_date|format }} </em>
+                        <p> {{ ann.text }} </p>
+                        {% if request.user.teacher_profile %}
+                            <a href="{% url 'delete-announce' id=ann.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                        {% endif %}
+                        <hr class="featurette-divider">
+                    {% endfor %}
+                {% else %}
+                    <a>Здесь пока ничего нет!</a>
+                {% endif %}
+                {% if request.user.teacher_profile %}
+                    <a href="{% url 'one-ann-create' course.pk %}"><button class="button-password" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/pencil-2-16.png' %}" alt="">Опубликовать объявление</button></a>
+                {% endif %}
+            </div>
+            <div id="course-tests" style="display:none;">
+                {% if tests %}
+                    {% if request.user.student_profile %}
+                        <h3>Доступные тесты</h3>
+                        {% for test in tests %}
+                            {% if test.status == 'DONE' %}
+                                <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    {% elif request.user.teacher_profile %}
+                        <h3>Тесты</h3>
+                        {% for test in tests %}
+                            {% if test.status == 'PROCESS' %}
+                                <a class="test-status-process" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                            {% elif test.status == 'DONE' %}
+                                <a class="test-status-done" href="{% url 'test' test.pk %}">  {{ test.name }}</a>
+                            {% elif test.status == 'CLOSED' %}
+                                <a class="test-status-closed" href="{% url 'test' test.pk %}">{{ test.name }}</a>
+                            {% endif %}
+                        {% endfor %}   
+                    {% endif %}
+                {% else %}
+                    <a>Здесь пока ничего нет!</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 {% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        $("#bt-course-lectures").click(function() {
+            $("#course-lectures").show();
+            $("#course-announces").hide();
+            $("#course-tests").hide();
+        });
+        $("#bt-course-announces").click(function() {
+            $("#course-announces").show();
+            $("#course-lectures").hide();
+            $("#course-tests").hide();
+        });
+        $("#bt-course-tests").click(function() {
+            $("#course-tests").show();
+            $("#course-lectures").hide();
+            $("#course-announces").hide();
+        });
+
+    });
+</script>
+{% endblock %}

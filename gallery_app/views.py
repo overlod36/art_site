@@ -21,10 +21,10 @@ class StudentGalleryListView(LoginRequiredMixin, ListView):
     model = Student_Gallery
     template_name = 'gallery/student_galleries_list.html'
     context_object_name = 'st_galleries'
-    paginate_by = 2
+    paginate_by = 3
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Student_Gallery.objects.filter(Q(status='INNER') | Q(status='PUBLIC'))
+        return Student_Gallery.objects.filter(Q(status='INNER') | Q(status='PUBLIC')).order_by('student__last_name')
 
 class StudentPictureCreateView(LoginRequiredMixin, CreateView):
     model = Student_Picture
@@ -58,9 +58,9 @@ class StudentPictureDeleteView(LoginRequiredMixin, DeleteView):
 def get_student_gallery(request, id):
     page = request.GET.get('page', 1)
     gallery = Student_Gallery.objects.get(pk=id)
-    images = Student_Picture.objects.filter(student_gallery=gallery) 
+    images = Student_Picture.objects.filter(student_gallery=gallery).order_by('publish_date') 
     form = StudentGalleryStatusForm(initial={'status': gallery.status})
-    paginator = Paginator(images, per_page=3)
+    paginator = Paginator(images, per_page=4)
     content = paginator.get_page(page)
     # page_object = paginator.get_page(page)
     context = {'content': content, 'images': images, 'gallery': gallery}

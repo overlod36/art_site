@@ -35,11 +35,16 @@ class Course(models.Model):
 
 class Lecture(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина' ,on_delete=models.CASCADE)
-    file = models.FileField(upload_to=file_methods.get_lecture_file_path, null=False, validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
+    file = models.FileField(upload_to=file_methods.get_lecture_file_path, null=False, validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'ppt', 'pptx'])])
 
     @property
     def filename(self):
         return str(os.path.basename(self.file.name))
+    
+    @property
+    def extension(self):
+        name, extension = os.path.splitext(self.file.name)
+        return extension
 
 class Test(models.Model):
     name = models.CharField(verbose_name='Название теста', max_length=50, blank=False)

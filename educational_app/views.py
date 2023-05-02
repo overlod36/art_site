@@ -235,5 +235,4 @@ def get_course_gradebook(request, id, group_num):
                             Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'],
                             Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum'],
                             "%.1f" % ((Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'] / Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum']) * 100)] for student in group.ordered_students]
-    print(context['students'][0][2])
     return render(request, 'educational/group_course_points.html', context)

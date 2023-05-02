@@ -54,9 +54,13 @@ class Teacher_Picture(Base_Picture):
         return f'Изображение преподавателя {self.teacher_gallery.teacher.first_name} {self.teacher_gallery.teacher.last_name}'
 
 @receiver(post_save, sender=Student_Gallery)
-def st_gallery_folder(sender, instance, created, *args, **kwargs):
+def st_gallery_create(sender, instance, created, *args, **kwargs):
     if created: file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'student_galleries', f'{instance.student.user.username}'))
 
 @receiver(pre_delete, sender=Student_Picture)
 def st_pic_delete(sender, instance, *args, **kwargs):
     if instance.student_img: instance.student_img.delete()
+
+@receiver(pre_delete, sender=Student_Gallery)
+def st_gallery_delete(sender, instance, *args, **kwargs):
+    file_methods.remove_folder(os.path.join(file_methods.PATH, 'content', 'student_galleries', f'{instance.student.user.username}'))

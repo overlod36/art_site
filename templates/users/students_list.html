@@ -1,6 +1,6 @@
 {% extends "base_app/base.html" %}
 {% load static %}
-{% load date_filter %}
+{% load users_date_filter %}
 {% block content %}
 
     <div class="students">
@@ -11,7 +11,9 @@
             <br/>
             <em> {{ student.student_profile.group }} </em>
             <br/>
-            <em> Последнее посещение сайта: {{ student.last_login }} </em>
+            {% if student.last_login %}
+                <em> Последнее посещение сайта: {{ student.last_login|format }} </em>
+            {% endif %}
             <p></p>
             <a href="{% url 'delete-student' student.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
             <a href="{% url 'update-student' student.student_profile.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>

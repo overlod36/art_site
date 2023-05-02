@@ -1,36 +1,36 @@
 {% extends "base_app/base.html" %}
 {% block content %}
 
-<h3>Журнал группы {{ group.number }}</h3>
-<br/>
-
-<table class="table">
-    <thead class="table-dark">
-      <tr>
-        <th scope="col">№</th>
-        <th scope="col">Студент</th>
-        {% for col in tests %}
-            <th scope="col">{{ col.name }}</th>
-        {% endfor %}
-        <th scope="col">Итоговые баллы</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for student in students %}
-        <tr>
-            <th scope="row">{{ forloop.counter }}</th>
-            <td>{{ student.0.last_name }} {{ student.0.first_name }}</td>
-            {% for el in student.1 %}
-                {% if el.test_attempt %}
-                    <td><a href="{% url 'test-attempt' el.test_attempt.pk %}">{{ el.points }} / {{ el.max_points }}</a><br/> {{el.percent}} %</td>
-                {% else %}
-                    <td>{{ el.points }} / {{ el.max_points }} <br/> {{el.percent}} %</td>
-                {% endif %}
+  <div class="gradebook-page-content">
+    <h3>Журнал группы {{ group.number }}</h3>
+    <br/>
+      <table class="table">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">№</th>
+              <th scope="col">Студент</th>
+              {% for col in tests %}
+                  <th scope="col">{{ col.name }}</th>
+              {% endfor %}
+              <th scope="col">Итоговые баллы</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+              <tr> 
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td>{{ student.0.last_name }} {{ student.0.first_name }}</td>
+                  {% for el in student.1 %}
+                      {% if el.test_attempt %}
+                          <td><a href="{% url 'test-attempt' el.test_attempt.pk %}">{{ el.points }} / {{ el.max_points }}</a><br/> {{el.percent}} %</td>
+                      {% else %}
+                          <td>{{ el.points }} / {{ el.max_points }} <br/> {{el.percent}} %</td>
+                      {% endif %}
+                  {% endfor %}
+                  <td>{{ student.2 }} / {{ student.3 }} <br/> {{ student.4 }} % </td>
+              </tr>
             {% endfor %}
-            <td>{{ student.2 }} / {{ student.3 }} <br/> {{ student.4 }} % </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
+          </tbody>
+      </table>
+    </div>
 {% endblock content %}
