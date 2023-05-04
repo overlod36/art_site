@@ -5,6 +5,7 @@ from educational_art_site.choices import *
 from django.dispatch.dispatcher import receiver
 from . import file_methods
 import os
+from PIL import Image
 
 class Base_Gallery(models.Model):
     title = models.CharField(verbose_name='Название галереи', max_length=50, null=True)
@@ -21,8 +22,12 @@ class Student_Gallery(Base_Gallery):
     def pictures_count(self):
         return self.student_picture_set.all().count()
 
+    @property
+    def cover(self):
+        return self.student_picture_set.latest('publish_date')
+
     def __str__(self):
-        return f'Галерея студента {self.student.first_name} {self.student.last_name}'
+        return f'Галерея студента {self.student.last_name} {self.student.first_name}'
 
 class Teacher_Gallery(Base_Gallery):
     teacher = models.OneToOneField(Teacher_Profile, on_delete=models.CASCADE)
@@ -42,6 +47,10 @@ class Base_Picture(models.Model):
 class Student_Picture(Base_Picture):
     student_img = models.ImageField(upload_to=file_methods.get_student_pic_path)
     student_gallery = models.ForeignKey(Student_Gallery, on_delete=models.CASCADE)
+        
+    @property
+    def pic_size(self):
+        return self.student_img.file.size
 
     def __str__(self):
         return f'Изображение студента {self.student_gallery.student.first_name} {self.student_gallery.student.last_name}'
@@ -52,6 +61,13 @@ class Teacher_Picture(Base_Picture):
 
     def __str__(self):
         return f'Изображение преподавателя {self.teacher_gallery.teacher.first_name} {self.teacher_gallery.teacher.last_name}'
+
+# @receiver(post_save, sender=Student_Picture)
+# def st_pic_compress(sender, instance, *args, **kwargs):
+#     if instance.student_img.file.size > file_methods.PIC_SIZE_RESTR:
+#             new_img = Image.open(instance.student_img.path)
+#             new_img.save(instance.student_img.path, quality=100, subsampling=0)
+#             new_img.close()
 
 @receiver(post_save, sender=Student_Gallery)
 def st_gallery_create(sender, instance, created, *args, **kwargs):

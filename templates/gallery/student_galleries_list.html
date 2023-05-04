@@ -1,17 +1,20 @@
 {% extends "base_app/base.html" %}
 {% load plural %}
+{% load static %}
 {% block content %}
     <div class="st-galleries-page-content">
-        <div class="galleries-list container my-5">
+        <div class="galleries-list ">
             <div class="row g-4">
                 {% for gal in st_galleries %}
                     <div class="col-4 d-flex justify-content-center">
-                        <div class="gl-list-el">
-                            <div class="card h-100" style="width: 18rem;">
-                                <img class="card-img-top" src="{{ img.student_img.url }}"/>
-                                <div class="card-body">
-                                    <a href="{% url 'student-gallery' gal.pk %}">{{gal}} <br/> {{gal.pictures_count|plural:"изображение,изображения,изображений"}}</a>
-                                </div>
+                        <div class="gl-list-el card h-100" style="width: 18rem;">
+                            {% if gal.pictures_count > 0 %}
+                                <img class="card-img-top" src="{{ gal.cover.student_img.url }}"/>
+                            {% else %}
+                                <img class="card-img-top" src="{% static 'img/picture-3-512.png' %}"/>
+                            {% endif %}
+                            <div class="card-body d-flex">
+                                <a class='text-decoration-none text-black' href="{% url 'student-gallery' gal.pk %}">{{gal}} <br/> {{gal.pictures_count|plural:"изображение,изображения,изображений"}}</a>
                             </div>
                         </div>
                     </div>

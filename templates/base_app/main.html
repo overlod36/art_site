@@ -1,0 +1,13 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block head_st %} <link rel="stylesheet" type="text/css" href="{% static 'css/base/content-styles.css' %}"> {% endblock %}
+
+{% block content %}
+
+    {% for new in news %}
+        <div class="ck ck-content">
+            {{ new.html|safe }}
+        </div>
+    {% endfor %}
+
+{% endblock content %}

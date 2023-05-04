@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from . models import Course_Announce
 from educational_app.models import Course
-from .forms import OneCourseAnnounceForm, CourseAnnounceForm
+from .forms import OneCourseAnnounceForm, CourseAnnounceForm, NewsAnnounceForm
 from django.views.generic import (
     ListView,
     DetailView,
@@ -78,3 +78,26 @@ class CourseAnnounceCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
+
+class NewsAnnounceCreateView(LoginRequiredMixin, CreateView):
+    form_class = NewsAnnounceForm
+    template_name = 'informing/news_create.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.user = request.user.teacher_profile
+            return super(NewsAnnounceCreateView, self).dispatch(request)
+
+    def form_valid(self, form):
+        form.instance.author = self.user
+        return super().form_valid(form)
+
+def news_announce_create(request):
+    return render(request, 'informing/news_create.html')
