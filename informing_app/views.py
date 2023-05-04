@@ -98,6 +98,3 @@ class NewsAnnounceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.user
         return super().form_valid(form)
-
-def news_announce_create(request):
-    return render(request, 'informing/news_create.html')

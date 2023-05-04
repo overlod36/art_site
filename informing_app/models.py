@@ -5,7 +5,7 @@ from users.models import Teacher_Profile, Admin_Profile
 from django_ckeditor_5.fields import CKEditor5Field
 
 class Base_Announce(models.Model):
-    title = models.CharField(verbose_name= 'Заголовок объявления', max_length=50)
+    title = models.CharField(verbose_name= 'Заголовок объявления', max_length=150)
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
 
     class Meta:

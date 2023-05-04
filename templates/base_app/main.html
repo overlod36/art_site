@@ -1,13 +1,25 @@
 {% extends "base_app/base.html" %}
 {% load static %}
+{% load date_filter %}
 {% block head_st %} <link rel="stylesheet" type="text/css" href="{% static 'css/base/content-styles.css' %}"> {% endblock %}
 
 {% block content %}
 
-    {% for new in news %}
-        <div class="ck ck-content">
-            {{ new.html|safe }}
-        </div>
-    {% endfor %}
+    <div class="news-page-content">
+        {% for new in news %}
+            <div class="news-container card" >
+                <div class="card-body">
+                    <div class="news-info">
+                        <h3>{{ new.title }}</h3>
+                        <p class="ann-small-text"> Дата публикации: {{ new.publish_date|format }}</p>
+                        <p class="ann-small-text"> Автор публикации: {{ new.author }} </p>
+                    </div>
+                    <div class="ck ck-content">
+                        {{ new.html|safe }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock content %}

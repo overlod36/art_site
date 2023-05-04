@@ -216,3 +216,20 @@
     text-decoration: none;
     border: none;
 }
+
+.news-page-content{
+    margin-top: 4vh;
+}
+
+.ann-small-text{
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.news-info{
+    margin-bottom: 20px;
+}
+
+.news-container{
+    margin-bottom: 20px;
+}
