@@ -21,7 +21,7 @@
 }
 
 .course{
-    margin-top: 40px;
+    margin-top: 20px;
     margin-bottom: 50px;
 }
 
@@ -221,6 +221,10 @@
     margin-top: 4vh;
 }
 
+.course-announces-page{
+    margin-top: 4vh;
+}
+
 .ann-small-text{
     font-size: 18px;
     margin-bottom: 5px;
@@ -232,4 +236,33 @@
 
 .news-container{
     margin-bottom: 20px;
+}
+
+.ann-container{
+    margin-bottom: 30px;
+}
+
+.ann-info{
+    margin-bottom: 20px;
+}
+
+.ann-title{
+    overflow: auto;
+}
+
+.news-title{
+    overflow: auto;
+}
+
+.title-left{
+    float: left;
+}
+
+.title-right{
+    float: right;
+}
+
+.course-section-title{
+    margin-bottom: 35px;
+    text-align: center;
 }

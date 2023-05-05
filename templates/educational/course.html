@@ -78,20 +78,25 @@
                 {% endif %}
             </div>
             <div id="course-announces" style="display:none;">
-                <h3>Объявления</h3>
+                <div class="course-section-title"><h3>Объявления</h3></div>
                 {% if announces %}
-                    {% for ann in announces %}
-                        <h4> {{ ann.title }} </h4>
-                        <em> Автор объявления: {{ ann.course.author }} </em>
-                        <br/>
-                        <em> Дисциплина: {{ ann.course.title }}</em>
-                        <br/>
-                        <em> Дата публикации: {{ ann.publish_date|format }} </em>
-                        <p> {{ ann.text }} </p>
-                        {% if request.user.teacher_profile %}
-                            <a href="{% url 'delete-announce' id=ann.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-                        {% endif %}
-                        <hr class="featurette-divider">
+                    {% for element in announces %}
+                        <div class="ann-container card">
+                            <div class="card-body">
+                                <div class="ann-info">
+                                    <div class="ann-title">
+                                        <h3 class="title-left"> {{ element.title }} </h3>
+                                        {% if request.user.teacher_profile %}
+                                            <a class="title-right" href="{% url 'delete-announce' id=element.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                                        {% endif %}
+                                    </div>
+                                    <p class="ann-small-text"> Дата публикации: {{ element.publish_date|format }}</p>
+                                    <p class="ann-small-text"> Автор публикации: {{ element.course.author }} </p>
+                                    <p class="ann-small-text"> Дисциплина: {{ element.course.title }} </p>
+                                </div>
+                                <p> {{ element.text|urlize  }} </p>
+                            </div>
+                        </div> 
                     {% endfor %}
                 {% else %}
                     <a>Здесь пока ничего нет!</a>

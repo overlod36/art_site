@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from . models import Course_Announce
+from . models import Course_Announce, News_Announce
 from educational_app.models import Course
 from .forms import OneCourseAnnounceForm, CourseAnnounceForm, NewsAnnounceForm
 from django.views.generic import (
@@ -98,3 +98,11 @@ class NewsAnnounceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.user
         return super().form_valid(form)
+
+def delete_news(request, id):
+    news = News_Announce.objects.get(pk=id)
+    if request.method == 'POST':
+        news.delete()
+        return redirect('main')
+    context = { 'item': news , 'name': 'новость' }
+    return render(request, 'informing/news_delete.html', context)
