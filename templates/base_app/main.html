@@ -13,7 +13,8 @@
                         <div class="news-title">
                             <h3 class="title-left">{{ new.title }}</h3>
                             {% if new.author.user == request.user %}
-                                <a class="title-right" href="{% url 'delete-news' id=new.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                                <a class="title-right btn-rnd" href="{% url 'delete-news' id=new.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                                <a class="title-right" href="{% url 'update-news' pk=new.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>
                             {% endif %}
                         </div>
                         <p class="ann-small-text"> Дата публикации: {{ new.publish_date|format }}</p>

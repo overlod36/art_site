@@ -1,3 +1,5 @@
+from typing import Any
+from django.db import models
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from . models import Course_Announce, News_Announce
@@ -98,6 +100,31 @@ class NewsAnnounceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.user
         return super().form_valid(form)
+
+class NewsAnnounceUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = NewsAnnounceForm
+    template_name = 'informing/news_update.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['pk']
+            return super(NewsAnnounceUpdateView, self).dispatch(request)
+
+    def get_success_url(self):
+        return reverse('main')
+    
+    def get_queryset(self):
+        instance = News_Announce.objects.filter(pk=self.pk)
+        return instance
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(self.get_success_url())
+
 
 def delete_news(request, id):
     news = News_Announce.objects.get(pk=id)
