@@ -2,6 +2,7 @@ from typing import Any
 from django.db import models
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django import forms
 from . models import Course_Announce, News_Announce
 from educational_app.models import Course
 from .forms import OneCourseAnnounceForm, CourseAnnounceForm, NewsAnnounceForm
@@ -41,6 +42,17 @@ def delete_announce(request, id):
 class OneCourseAnnounceCreateView(LoginRequiredMixin, CreateView):
     form_class = OneCourseAnnounceForm
     template_name = 'informing/announce_create.html'
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(OneCourseAnnounceCreateView, self).get_form(form_class)
+        form.fields['title'].widget.attrs['placeholder'] = 'Заголовок объявления'
+        form.fields['title'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['text'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['title'].label = ''
+        form.fields['text'].label = ''
+        return form
 
     def get_success_url(self):
         return reverse('announces')

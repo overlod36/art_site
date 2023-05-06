@@ -1,15 +1,21 @@
 {% extends "base_app/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
+    <div class="course-add-page">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Новый курс</legend>
-                {{ form|crispy }}
+                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Добавление дисциплины</h3>
+                {% for field in form %}
+                    {% if field.name == 'groups' %}
+                        {{ field }}
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Сохранить</button>
+                <button type="submit" class="btn btn-info mt-2">Опубликовать</button>
             </div>
         </form>
     </div>

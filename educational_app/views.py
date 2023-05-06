@@ -29,6 +29,15 @@ class LectureCreateView(LoginRequiredMixin, CreateView):
     template_name = 'educational/lecture_create.html'
     fields = ['file']
 
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(LectureCreateView, self).get_form(form_class)
+        form.fields['file'].label = ''
+        form.fields['file'].widget.attrs['class'] = 'form-control mb-4'
+        
+        return form
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
@@ -58,6 +67,20 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
     model = Course
     template_name = 'educational/course_create.html'
     fields = ['title', 'groups', 'description']
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(CourseCreateView, self).get_form(form_class)
+        form.fields['title'].widget.attrs['placeholder'] = 'Название дисциплины'
+        form.fields['title'].label = ''
+        form.fields['title'].widget.attrs['class'] = 'form-control mb-2'
+        form.fields['groups'].label=''
+        form.fields['groups'].widget.attrs['placeholder'] = 'Группы' 
+        form.fields['groups'].widget.attrs['class'] = 'form-select mb-2'
+        form.fields['description'].label = ''
+        form.fields['description'].widget.attrs['class'] = 'form-control'
+        return form
 
     def dispatch(self, request):
         if not request.user.is_authenticated:

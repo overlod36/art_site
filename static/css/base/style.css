@@ -316,3 +316,43 @@
 .add-material{
     margin-top: 40px;
 }
+
+.word-count{
+    font-size: 15px;
+}
+
+.news-add-page{
+    margin: 4vh;
+    margin-top: 50px;
+}
+
+.ann-add-page{
+    margin: 4vh;
+    margin-top: 50px;
+}
+
+.course-add-page{
+    margin: 4vh;
+    margin-top: 50px;
+}
+
+.lecture-add-page{
+    margin: 4vh;
+    margin-top: 50px;
+}
+
+.delete-page{
+    margin: 7vh;
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.delete-page h3{
+    align-self: center;
+}
+
+.delete-page form{
+    align-self: center;
+}

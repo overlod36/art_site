@@ -9,6 +9,8 @@ class OneCourseAnnounceForm(forms.ModelForm):
         model = Course_Announce
         fields = ['title', 'text']
     
+
+    
 class CourseAnnounceForm(forms.ModelForm):
     class Meta:
         model = Course_Announce
@@ -18,12 +20,23 @@ class CourseAnnounceForm(forms.ModelForm):
         to_user = kwargs.pop('user')
         super(CourseAnnounceForm, self).__init__(*args, **kwargs)
         self.fields['course'].queryset = Course.objects.filter(author=to_user.teacher_profile).all()
+        self.fields['title'].widget.attrs['placeholder'] = 'Заголовок объявления'
+        self.fields['title'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['text'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['course'].widget.attrs['class'] = 'form-select'
+        self.fields['course'].label = ''
+        self.fields['title'].label = ''
+        self.fields['text'].label = ''
 
 class NewsAnnounceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
           super().__init__(*args, **kwargs)
-          self.fields["html"].required = False
+          self.fields['html'].required = False
+          self.fields['title'].widget.attrs['class'] = 'form-control'
+          self.fields['title'].widget.attrs['placeholder'] = 'Заголовок объявления'
+          self.fields['title'].label = ''
+          
 
     class Meta:
         model = News_Announce

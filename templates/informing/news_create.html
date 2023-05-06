@@ -1,17 +1,23 @@
 {% extends "base_app/base.html" %}
 
 {% block content %}
-    <div class="content-section">
+    <div class="news-add-page">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Новая новость</legend>
+                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Добавление новости</h3>
                 {{ form.media }}
                 {{ form.as_p }}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Сохранить</button>
+                <button type="submit" class="btn btn-info mt-2">Опубликовать</button>
             </div>
         </form>
     </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+    $('label[for="id_html"]').hide ();
+</script>
+{% endblock script %}
