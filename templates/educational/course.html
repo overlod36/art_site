@@ -51,31 +51,32 @@
 
         <div class="course col py-3 px-4">
             <div id="course-lectures" style="display:none;">
-                <h3>Лекции</h3>
+                <div class="course-section-title"><h3>Лекции</h3></div>
                 {% if lectures %}
                     {% for lec in lectures %}
-                        {% if lec.extension == '.pdf' %}
-                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
-                        {% elif lec.extension == '.doc' or lec.extension == '.docx' %}
-                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/word-3-32.png' %}" alt=""> {{ lec.filename }} </a>
-                        {% elif lec.extension == '.ppt' or lec.extension == '.pptx' %}
-                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/powerpoint-3-32.png' %}" alt=""> {{ lec.filename }} </a>
-                        {% else %}
-                            <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ lec.filename }} </a>
-                        {% endif %}
-                        <br/>
-                        <p></p>
-                        {% if request.user.teacher_profile %}
-                            <a href="{% url 'lecture-delete' lec.pk %}"><button class="lec-button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-                        {% endif %}
-                        <p></p>
+                        <div class="course-material">
+                            {% if lec.extension == '.pdf' %}
+                                <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/pdf-32.png' %}" alt=""> {{ lec.filename }} </a>
+                            {% elif lec.extension == '.doc' or lec.extension == '.docx' %}
+                                <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/word-3-32.png' %}" alt=""> {{ lec.filename }} </a>
+                            {% elif lec.extension == '.ppt' or lec.extension == '.pptx' %}
+                                <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/powerpoint-3-32.png' %}" alt=""> {{ lec.filename }} </a>
+                            {% else %}
+                                <a href="{% url 'download-lec' lec.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ lec.filename }} </a>
+                            {% endif %}
+                            {% if request.user.teacher_profile %}
+                                <a href="{% url 'lecture-delete' lec.pk %}"><button class="lec-button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 {% else %}
                     <a>Здесь пока ничего нет!</a>
                 {% endif %}
-                {% if request.user.teacher_profile %}
-                    <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
-                {% endif %}
+                <div class="add-material">
+                    {% if request.user.teacher_profile %}
+                        <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
+                    {% endif %}
+                </div>
             </div>
             <div id="course-announces" style="display:none;">
                 <div class="course-section-title"><h3>Объявления</h3></div>
@@ -108,22 +109,24 @@
             <div id="course-tests" style="display:none;">
                 {% if tests %}
                     {% if request.user.student_profile %}
-                        <h3>Доступные тесты</h3>
+                        <div class="course-section-title"><h3>Доступные тесты</h3></div>
                         {% for test in tests %}
                             {% if test.status == 'DONE' %}
                                 <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.name }}</a>
                             {% endif %}
                         {% endfor %}
                     {% elif request.user.teacher_profile %}
-                        <h3>Тесты</h3>
+                        <div class="course-section-title"><h3>Доступные тесты</h3></div>
                         {% for test in tests %}
-                            {% if test.status == 'PROCESS' %}
-                                <a class="test-status-process" href="{% url 'test' test.pk %}">{{ test.name }}</a>
-                            {% elif test.status == 'DONE' %}
-                                <a class="test-status-done" href="{% url 'test' test.pk %}">  {{ test.name }}</a>
-                            {% elif test.status == 'CLOSED' %}
-                                <a class="test-status-closed" href="{% url 'test' test.pk %}">{{ test.name }}</a>
-                            {% endif %}
+                            <div class="course-material">
+                                {% if test.status == 'PROCESS' %}
+                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-q-32.png' %}" alt=""> {{ test.name }}</a>
+                                {% elif test.status == 'DONE' %}
+                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-m-32.png' %}" alt=""> {{ test.name }}</a>
+                                {% elif test.status == 'CLOSED' %}
+                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-x-32.png' %}" alt=""> {{ test.name }}</a>
+                                {% endif %}
+                            </div>
                         {% endfor %}   
                     {% endif %}
                 {% else %}

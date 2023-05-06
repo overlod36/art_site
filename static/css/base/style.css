@@ -263,10 +263,56 @@
 }
 
 .course-section-title{
-    margin-bottom: 35px;
+    margin-bottom: 90px;
     text-align: center;
 }
 
 .btn-rnd{
     margin-left: 10px;
+}
+
+.profile-page{
+    margin: 4vh;
+}
+
+.profile{
+    display: flex;
+}
+
+.l-profile{
+    flex-grow:1;
+}
+
+.r-profile{
+    flex-grow:1;
+}
+
+.profile-info{
+    width: 47%;
+    margin: 2vh;
+    padding: 3vh;
+}
+
+.profile-act{
+    width: 47%;
+    margin: 2vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+
+.st-gal{
+    margin: 2vh;
+    margin-left: 3vh;
+}
+
+#course-lectures{
+    margin: 2vh;
+}
+
+.course-material{
+    margin-bottom: 30px;
+}
+
+.add-material{
+    margin-top: 40px;
 }

@@ -3,60 +3,76 @@
 {% load static %}
 {% block content %}
 
-<div class="content-section">
-    <div class="media-body">
-        <h2 class="account-heading">{{ request.user.username }}</h2>
-        {% if request.user.student_profile %}
-            
-            <p class="text-secondary"> Студент {{ request.user.student_profile.last_name }} {{ request.user.student_profile.first_name }} </p>
-
-            <p class="text-secondary"> Группа {{ request.user.student_profile.group.number }}</p>
-
-            <div class="courses_list">
-                <div class="list-group">
+<div class="profile-page">
+    <div class="profile">
+        <div class="l-profile">
+            <div class="profile-info border rounded">
+                <h2 class="account-heading">{{ request.user.username }}</h2>
+                {% if request.user.student_profile %}
+                    <p class="text-secondary"> Студент {{ request.user.student_profile.last_name }} {{ request.user.student_profile.first_name }} </p>
+                    <p class="text-secondary"> Группа {{ request.user.student_profile.group.number }}</p>
+                {% elif request.user.teacher_profile %}
+                    <p class="text-secondary"> Преподаватель {{ request.user.teacher_profile.last_name }} {{ request.user.teacher_profile.first_name }} </p>
+                {% elif request.user.admin_profile %}
+                    <p class="text-secondary"> Администратор {{ request.user.username }} </p>
+                {% endif %}
+            </div>
+            {% if request.user.student_profile %}
+                <ul class="list-group rounded profile-act">
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'student-gallery' id=request.user.student_profile.student_gallery.pk %}"><img class="use-ico" src="{% static 'img/photo-24.png' %}" alt="">Галерея</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="#"><img class="use-ico" src="{% static 'img/newspaper-10-24.png' %}" alt="">Оценки</a></li>
+                </ul>
+            {% elif request.user.teacher_profile %}
+                <ul class="list-group rounded profile-act">
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="#" alt=""> <img class="use-ico" src="{% static 'img/photo-24.png' %}" alt="">Галерея</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="#"><img class="use-ico" src="{% static 'img/magazine-24.png' %}" alt="">Журнал</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'course-create'%}"><img class="use-ico" src="{% static 'img/course.png' %}" alt="">Добавить дисциплину</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/edit-9-24.png' %}" alt="">Опубликовать объявление</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'news-create'%}"><img class="use-ico" src="{% static 'img/newspaper-11-24.png' %}" alt="">Опубликовать новость</a></li>
+                </ul>
+            {% endif %}
+        </div>
+        <div class="r-profile">
+            {% if request.user.student_profile %}
+                <h4 style="margin-bottom: 25px">Дисциплины</h4>
+                <ul class="list-group bg-light rounded">
                     {% for course in courses %}
-                        <a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a>
+                        <li class="list-group-item"><a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a></li>
                     {% endfor %}
-                </div>
-            </div>
-
-        {% elif request.user.teacher_profile %}
-            <p class="text-secondary"> Преподаватель {{ request.user.teacher_profile.last_name }} {{ request.user.teacher_profile.first_name }} </p>
-            <div class="bg-light p-5 rounded">
-                <h4>Дисциплины</h4>
-                <div class="list-group">
+                </ul>
+            {% elif request.user.teacher_profile %}
+                <h4 style="margin-bottom: 25px">Дисциплины</h4>
+                <ul class="list-group bg-light rounded">
                     {% for course in courses %}
-                        <a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a>
+                        <li class="list-group-item"><a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a></li>
                     {% endfor %}
+                </ul>
+            {% elif request.user.admin_profile %}
+                <div class="list-group">
+                    <a class="text-decoration-none link-secondary" href="{% url 'group-create' %}"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
+                    <div class="dropend">
+                        <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset1" data-bs-toggle="dropdown" data-bs-offset="0,45"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset1">
+                            <li><a class="dropdown-item" href="{% url 'student-create' %}">Добавление студента</a></li>
+                            <li><a class="dropdown-item" href="{% url 'teacher-create' %}">Добавление преподавателя</a></li>
+                            {% if request.user.is_superuser %}
+                                <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="dropend">
+                        <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset2" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Отображение пользователей</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset2">
+                            <li><a class="dropdown-item" href="{% url 'students' %}">Студенты</a></li>
+                            <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
+                            {% if request.user.is_superuser %}
+                                <li><a class="dropdown-item" href="{% url 'admins' %}">Администраторы</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        {% elif request.user.admin_profile %}
-            <p class="text-secondary"> Администратор {{ request.user.username }} </p>
-            <div class="list-group">
-                <a class="text-decoration-none link-secondary" href="{% url 'group-create' %}"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
-                <div class="dropend">
-                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset1" data-bs-toggle="dropdown" data-bs-offset="0,45"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset1">
-                        <li><a class="dropdown-item" href="{% url 'student-create' %}">Добавление студента</a></li>
-                        <li><a class="dropdown-item" href="{% url 'teacher-create' %}">Добавление преподавателя</a></li>
-                        {% if request.user.is_superuser %}
-                            <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="dropend">
-                    <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset2" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Отображение пользователей</a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset2">
-                        <li><a class="dropdown-item" href="{% url 'students' %}">Студенты</a></li>
-                        <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
-                        {% if request.user.is_superuser %}
-                            <li><a class="dropdown-item" href="{% url 'admins' %}">Администраторы</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-            
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </div>
 
