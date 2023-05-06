@@ -10,6 +10,10 @@ class Study_Group(models.Model):
     @property
     def ordered_students(self):
         return self.student_profile_set.all().order_by('last_name')
+    
+    @property
+    def only_number(self):
+        return self.number
 
     def __str__(self):
         return f'Группа {self.number}'

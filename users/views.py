@@ -21,12 +21,13 @@ from django.forms import modelform_factory
 @login_required(login_url='/login/')
 @check_profile_activation
 def profile(request):
+    context={}
     if hasattr(request.user, 'student_profile'):
-        context = { 'courses': Course.objects.filter(groups = request.user.student_profile.group) }
+        context ['courses'] = Course.objects.filter(groups = request.user.student_profile.group) 
     elif hasattr(request.user, 'teacher_profile'):
-        context = { 'courses': Course.objects.filter(author = request.user.teacher_profile)}
+        context ['courses'] = Course.objects.filter(author = request.user.teacher_profile)
     elif hasattr(request.user, 'admin_profile'):
-        context = {}
+        context['students'] = [student for student in Student_Profile.objects.all().order_by('group')]
     return render(request, 'users/profile.html', context)
 
 class PasswordUpdateView(LoginRequiredMixin, UpdateView):

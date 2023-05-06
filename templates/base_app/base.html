@@ -22,11 +22,6 @@
           </div>
           <div class="right-nav navbar-nav">
             {% if request.user.is_authenticated %}
-              {% if request.user.admin_profile %}
-                {% if user.is_superuser %}
-                  <a class="nav-item nav-link" href="{% url 'admin:index' %}"><img class="use-ico" src="{% static 'img/user-3-24.png' %}" alt=""></a>
-                {% endif %}
-              {% endif %}
               {% return_login request.user as login %}
               <a class="nav-item nav-link" href="{% url 'profile'%}"><img class="use-ico" src="{% static 'img/user.png' %}" alt="">{{ login }}</a>
               <a class="nav-item nav-link" href="{% url 'logout' %}">Выход</a>

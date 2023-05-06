@@ -23,7 +23,7 @@ TEST_ATTEMPT_STATUS = (
 )
 
 STUDENT_GALLERY_VISIBILITY = (
-    ("PRIVATE", "Закрытый"),
-    ("INNER", "Внутренний"),
-    ("PUBLIC", "Открытый")
+    ("PRIVATE", "Закрытая"),
+    ("INNER", "Внутренняя"),
+    ("PUBLIC", "Открытая")
 )

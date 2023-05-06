@@ -30,6 +30,27 @@
                     <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'ann-create'%}"><img class="use-ico" src="{% static 'img/edit-9-24.png' %}" alt="">Опубликовать объявление</a></li>
                     <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'news-create'%}"><img class="use-ico" src="{% static 'img/newspaper-11-24.png' %}" alt="">Опубликовать новость</a></li>
                 </ul>
+            {% elif request.user.admin_profile %}
+                <ul class="list-group rounded profile-act">
+                    {% if request.user.is_superuser %}
+                        <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'admin:index' %}" alt=""> <img class="use-ico" style="width:20px" src="{% static 'img/django-logo.png' %}" alt="">Страница администратора</a></li>
+                    {% endif %}
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'group-create' %}" alt=""> <img class="use-ico" src="{% static 'img/conference-24.png' %}" alt="">Добавить группу</a></li>
+                    <div class="dropdown dropdown-menu-end">
+                        <li class="list-group-item" data-bs-toggle="dropdown">
+                            <a class="nav-item nav-link text-secondary st-gal" href="#" alt=""> <img class="use-ico" src="{% static 'img/add-user.png' %}" alt="">Добавить пользователя</a>
+                        </li>
+                        <ul class="dropdown-menu rounded-0 w-100">
+                            <li><a class="dropdown-item text-secondary" href="{% url 'student-create' %}">Cтудент</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item  text-secondary" href="{% url 'teacher-create' %}">Преподаватель</a></li>
+                            {% if request.user.is_superuser %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-secondary" href="{% url 'admin-create' %}">Администратор</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </ul>
             {% endif %}
         </div>
         <div class="r-profile">
@@ -48,27 +69,27 @@
                     {% endfor %}
                 </ul>
             {% elif request.user.admin_profile %}
-                <div class="list-group">
-                    <a class="text-decoration-none link-secondary" href="{% url 'group-create' %}"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление группы</a>
-                    <div class="dropend">
-                        <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset1" data-bs-toggle="dropdown" data-bs-offset="0,45"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Добавление пользователя</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset1">
-                            <li><a class="dropdown-item" href="{% url 'student-create' %}">Добавление студента</a></li>
-                            <li><a class="dropdown-item" href="{% url 'teacher-create' %}">Добавление преподавателя</a></li>
-                            {% if request.user.is_superuser %}
-                                <li><a class="dropdown-item" href="{% url 'admin-create' %}">Добавление администратора</a></li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    <div class="dropend">
-                        <a class="text-decoration-none link-secondary" type="button" data-bs-target="#dropdownMenuOffset2" data-bs-toggle="dropdown" data-bs-offset="0,20"><img class="use-ico" src="{% static 'img/play-6-24.png' %}" alt="">Отображение пользователей</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuOffset2">
-                            <li><a class="dropdown-item" href="{% url 'students' %}">Студенты</a></li>
-                            <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
-                            {% if request.user.is_superuser %}
-                                <li><a class="dropdown-item" href="{% url 'admins' %}">Администраторы</a></li>
-                            {% endif %}
-                        </ul>
+                <div class="admin-page">
+                    <div class="admin-panel">
+                        <table class="table adm-student-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">№</th>
+                                    <th scope="col">Студент</th>
+                                    <th scope="col">Группа</th>
+                                    <th scope="col">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <td>{{ student.last_name }} {{ student.first_name }} <br/> <a class="admin-panel-login">{{ student.user.username }}</a> </td>
+                                        <td>{{ student.group.only_number }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             {% endif %}

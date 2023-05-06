@@ -10,6 +10,7 @@ class StudentGalleryStatusForm(ModelForm):
             field = self.fields.get(field_name)
             if field and isinstance(field , forms.TypedChoiceField):
                 field.choices = field.choices[1:]
+                field.widget.attrs['class'] = 'form-select'
         
     class Meta:
         model = Student_Gallery

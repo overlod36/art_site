@@ -31,6 +31,17 @@ class StudentPictureCreateView(LoginRequiredMixin, CreateView):
     template_name = 'gallery/picture_upload.html'
     fields = ['student_img', 'description']
 
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(StudentPictureCreateView, self).get_form(form_class)
+        form.fields['student_img'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['description'].widget.attrs['placeholder'] = 'Описание картины'
+        form.fields['description'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['description'].label = ''
+        form.fields['student_img'].label = ''
+        return form
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)

@@ -280,7 +280,7 @@
 }
 
 .l-profile{
-    flex-grow:1;
+    flex-grow:0.3;
 }
 
 .r-profile{
@@ -288,13 +288,13 @@
 }
 
 .profile-info{
-    width: 47%;
+    width: 70%;
     margin: 2vh;
     padding: 3vh;
 }
 
 .profile-act{
-    width: 47%;
+    width: 70%;
     margin: 2vh;
     padding-top: 1vh;
     padding-bottom: 1vh;
@@ -355,4 +355,25 @@
 
 .delete-page form{
     align-self: center;
+}
+
+.pic-load{
+    margin: 4vh;
+    margin-top: 50px;
+}
+
+.admin-page{
+    margin-top: 30px;
+}
+
+.admin-panel{
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.admin-panel-login{
+    color: black;
+    font-size: 15px;
+    text-decoration: inherit;
+    font-weight: bold;
 }

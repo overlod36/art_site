@@ -2,15 +2,15 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<div class="content-section">
+<div class="pic-load">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Загрузка изображения</legend>
+            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Загрузка изображения</h3>
             {{ form|crispy }}
         </fieldset>
         <div class="form-group">
-            <button class="btn btn-outline-info" type="submit">Загрузить</button>
+            <button type="submit" class="btn btn-info mt-2">Опубликовать</button>
         </div>
     </form>
 </div>
