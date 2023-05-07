@@ -22,14 +22,15 @@ class Course(models.Model):
     def groups_list(self):
         return self.groups.all()
 
-
     def save(self, *args, **kwargs):
-        if not self.code_name:
-            self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'lectures'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tests'))
-        file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tasks'))
+        if self._state.adding:
+            if not self.code_name:
+                self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
+            file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'lectures'))
+            file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tests'))
+            file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.code_name, 'tasks'))
         super(Course, self).save(*args, **kwargs)
+        
     def __str__(self):
         return f"Курс: {self.title}, преподаватель: {self.author}"
 

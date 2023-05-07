@@ -236,7 +236,8 @@
 .pagi{
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 40px;
+    margin-bottom: 60px;
 }
 
 .gl-list-el{
@@ -309,7 +310,7 @@
 }
 
 .l-profile{
-    flex-grow:0.3;
+    flex-grow:0.52;
 }
 
 .r-profile{
@@ -404,5 +405,10 @@
 
 .students-table{
     overflow-y: auto;
-    height: 300px;
+    max-height: 300px;
+}
+
+.gal-img{
+    max-height: 500px;
+    width: auto;
 }

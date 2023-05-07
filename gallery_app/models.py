@@ -8,8 +8,8 @@ import os
 from PIL import Image
 
 class Base_Gallery(models.Model):
-    title = models.CharField(verbose_name='Название галереи', max_length=50, null=True)
-    description = models.CharField(verbose_name='Описание галереи', max_length=50, null=True)
+    title = models.CharField(verbose_name='Название галереи', max_length=150, null=True)
+    description = models.CharField(verbose_name='Описание галереи', max_length=650, null=True)
 
     class Meta:
         abstract = True
@@ -35,14 +35,39 @@ class Teacher_Gallery(Base_Gallery):
     def __str__(self):
         return f'Галерея преподавателя {self.teacher.first_name} {self.teacher.last_name}'
 
+class Public_Gallery(Base_Gallery):
+    author = models.ForeignKey(Teacher_Profile, on_delete=models.CASCADE)
+    code_name = models.CharField(blank=True, unique=True, max_length=150)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            if not self.code_name:
+                self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
+            file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'public_galleries', self.code_name))
+        super(Public_Gallery, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Публичная галерея за авторством {self.author.last_name} {self.author.first_name}'
+
 
 class Base_Picture(models.Model):
-    title = models.CharField(verbose_name='Название картины', null = True, max_length=50)
-    description = models.CharField(verbose_name='Описание картины', null = True, max_length=50)
+    title = models.CharField(verbose_name='Название картины', null = True, max_length=150)
+    description = models.CharField(verbose_name='Описание картины', null = True, max_length=650)
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации картины')
 
     class Meta:
         abstract = True
+
+class Public_Picture(Base_Picture):
+    public_img = models.ImageField(upload_to=file_methods.get_public_pic_path)
+    public_gallery = models.ForeignKey(Public_Gallery, on_delete=models.CASCADE)
+        
+    @property
+    def pic_size(self):
+        return self.public_img.file.size
+
+    def __str__(self):
+        return f'Изображение {self.public_gallery}'
 
 class Student_Picture(Base_Picture):
     student_img = models.ImageField(upload_to=file_methods.get_student_pic_path)

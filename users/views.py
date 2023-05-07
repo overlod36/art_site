@@ -12,6 +12,7 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentForm, TeacherForm, AdminForm, StudyGroupForm, UserForm
 from .models import Student_Profile, Teacher_Profile, Admin_Profile
+from gallery_app.models import Public_Gallery
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -26,6 +27,7 @@ def profile(request):
         context ['courses'] = Course.objects.filter(groups = request.user.student_profile.group) 
     elif hasattr(request.user, 'teacher_profile'):
         context ['courses'] = Course.objects.filter(author = request.user.teacher_profile)
+        context ['gals'] = Public_Gallery.objects.filter(author = request.user.teacher_profile)
     elif hasattr(request.user, 'admin_profile'):
         context['students'] = [student for student in Student_Profile.objects.all().order_by('group')]
         context['teachers'] = [teacher for teacher in Teacher_Profile.objects.all()]
