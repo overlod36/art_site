@@ -12,6 +12,14 @@
     margin-right: 0.5rem; margin-bottom: 0.1rem;
 }
 
+.solo-ico{
+    margin-bottom: 0.3rem;
+}
+
+.solo-ico-2{
+    margin-bottom: 0.2rem;
+}
+
 .danger-ico{
     margin-right: 0.5rem; margin-bottom: 0.3rem;
 }
@@ -34,6 +42,26 @@
     color: white;
     border: none;
     padding: 8px 17px;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.button-admin-trash{
+    background-color: red;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.button-admin-edit{
+    background-color: rgb(7, 246, 11);
+    color: white;
+    border: none;
+    margin-top: 10px;
+    padding: 5px 10px;
     border-radius: 8px;
     font-size: 17px;
 }
@@ -272,7 +300,8 @@
 }
 
 .profile-page{
-    margin: 4vh;
+    margin: 2vh;
+    margin-bottom: 5vh;
 }
 
 .profile{
@@ -321,22 +350,17 @@
     font-size: 15px;
 }
 
-.news-add-page{
+.add-page{
     margin: 4vh;
     margin-top: 50px;
 }
 
-.ann-add-page{
+.add-page{
     margin: 4vh;
     margin-top: 50px;
 }
 
-.course-add-page{
-    margin: 4vh;
-    margin-top: 50px;
-}
-
-.lecture-add-page{
+.add-page{
     margin: 4vh;
     margin-top: 50px;
 }
@@ -363,7 +387,7 @@
 }
 
 .admin-page{
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 .admin-panel{
@@ -376,4 +400,9 @@
     font-size: 15px;
     text-decoration: inherit;
     font-weight: bold;
+}
+
+.students-table{
+    overflow-y: auto;
+    height: 300px;
 }

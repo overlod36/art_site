@@ -1,5 +1,6 @@
 {% extends "base_app/base.html" %}
 {% load check_user %}
+{% load users_date_filter %}
 {% load static %}
 {% block content %}
 
@@ -41,12 +42,12 @@
                             <a class="nav-item nav-link text-secondary st-gal" href="#" alt=""> <img class="use-ico" src="{% static 'img/add-user.png' %}" alt="">Добавить пользователя</a>
                         </li>
                         <ul class="dropdown-menu rounded-0 w-100">
-                            <li><a class="dropdown-item text-secondary" href="{% url 'student-create' %}">Cтудент</a></li>
+                            <li><a class="dropdown-item text-secondary text-center" href="{% url 'student-create' %}">Cтудент</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item  text-secondary" href="{% url 'teacher-create' %}">Преподаватель</a></li>
+                            <li><a class="dropdown-item  text-secondary text-center" href="{% url 'teacher-create' %}">Преподаватель</a></li>
                             {% if request.user.is_superuser %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-secondary" href="{% url 'admin-create' %}">Администратор</a></li>
+                                <li><a class="dropdown-item text-secondary text-center" href="{% url 'admin-create' %}">Администратор</a></li>
                             {% endif %}
                         </ul>
                     </div>
@@ -55,14 +56,14 @@
         </div>
         <div class="r-profile">
             {% if request.user.student_profile %}
-                <h4 style="margin-bottom: 25px">Дисциплины</h4>
+                <h4 class="fw-normal mb-3 mt-3 pb-3" style="letter-spacing: 1px;">Дисциплины</h4>
                 <ul class="list-group bg-light rounded">
                     {% for course in courses %}
                         <li class="list-group-item"><a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a></li>
                     {% endfor %}
                 </ul>
             {% elif request.user.teacher_profile %}
-                <h4 style="margin-bottom: 25px">Дисциплины</h4>
+                <h4 class="fw-normal mb-3 mt-3 pb-3" style="letter-spacing: 1px;">Дисциплины</h4>
                 <ul class="list-group bg-light rounded">
                     {% for course in courses %}
                         <li class="list-group-item"><a class="text-decoration-none link-secondary" href="{% url 'course-view' id=course.pk %}">{{course.title}}</a></li>
@@ -71,25 +72,139 @@
             {% elif request.user.admin_profile %}
                 <div class="admin-page">
                     <div class="admin-panel">
-                        <table class="table adm-student-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">№</th>
-                                    <th scope="col">Студент</th>
-                                    <th scope="col">Группа</th>
-                                    <th scope="col">Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for student in students %}
+                        <h4 class="fw-normal mb-2 pb-3" style="letter-spacing: 1px;">Студенты</h4>
+                        <div class="students-table">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <th scope="row">{{ forloop.counter }}</th>
-                                        <td>{{ student.last_name }} {{ student.first_name }} <br/> <a class="admin-panel-login">{{ student.user.username }}</a> </td>
-                                        <td>{{ student.group.only_number }}</td>
+                                        <th scope="col">№</th>
+                                        <th scope="col">Студент</th>
+                                        <th scope="col">Группа</th>
+                                        <th scope="col">Последнее посещение сайта</th>
+                                        <th scope="col">Действия</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ student.last_name }} {{ student.first_name }} <br/> <a class="admin-panel-login">{{ student.user.username }}</a> </td>
+                                            <td>{{ student.group.only_number }}</td>
+                                            <td>
+                                                {% if student.user.last_login %}
+                                                    <em> {{ student.user.last_login|format }} </em>
+                                                {% else %}
+                                                    <em>-</em>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a class="text-decoration-none" href="{% url 'delete-student' student.user.pk %}">
+                                                    <button class="button-admin-trash">
+                                                        <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                                                    </button>
+                                                </a>
+                                                <a class="text-decoration-none" href="{% url 'update-student' student.pk %}">
+                                                    <button class="button-admin-edit">
+                                                        <img class="solo-ico-2" src="{% static 'img/settings-12-16.png' %}" alt="">
+                                                    </button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <h4 class="fw-normal mb-2 mt-3 pb-3" style="letter-spacing: 1px;">Преподаватели</h4>
+                        <div class="teachers-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">№</th>
+                                        <th scope="col">Преподаватель</th>
+                                        <th scope="col">Последнее посещение сайта</th>
+                                        <th scope="col">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for teacher in teachers %}
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ teacher.last_name }} {{ teacher.first_name }} <br/> <a class="admin-panel-login">{{ teacher.user.username }}</a> </td>
+                                            <td>
+                                                {% if teacher.user.last_login %}
+                                                    <em> {{ teacher.user.last_login|format }} </em>
+                                                {% else %}
+                                                    <em>-</em>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a class="text-decoration-none" href="{% url 'delete-teacher' teacher.user.pk %}">
+                                                    <button class="button-admin-trash">
+                                                        <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                                                    </button>
+                                                </a>
+                                                <a class="text-decoration-none" href="{% url 'update-teacher' teacher.pk %}">
+                                                    <button class="button-admin-edit">
+                                                        <img class="solo-ico-2" src="{% static 'img/settings-12-16.png' %}" alt="">
+                                                    </button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if request.user.is_superuser %}
+                            <h4 class="fw-normal mb-2 pb-3" style="letter-spacing: 1px;">Администраторы</h4>
+                            <div class="admins-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">№</th>
+                                            <th scope="col">Администратор</th>
+                                            <th scope="col">Последнее посещение сайта</th>
+                                            <th scope="col">Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for admin in admins %}
+                                            <tr>
+                                                <th scope="row">{{ forloop.counter }}</th>
+                                                <td>{{ admin.last_name }} {{ admin.first_name }} <br/> 
+                                                    <a class="admin-panel-login">{{ admin.user.username }} </a>
+                                                    {% if admin.user.is_superuser %} 
+                                                        <img style="width:16px" src="{% static 'img/django-logo.png' %}" alt="">
+                                                    {% else %}
+                                                        <img src="{% static 'img/admin-16.png' %}" alt="">
+                                                    {% endif %} 
+                                                </td>
+                                                <td>
+                                                    {% if admin.user.last_login %}
+                                                        <em> {{ admin.user.last_login|format }} </em>
+                                                    {% else %}
+                                                        <em>-</em>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if not admin.pk == request.user.pk %}
+                                                        <a class="text-decoration-none" href="{% url 'delete-admin' admin.user.pk %}">
+                                                            <button class="button-admin-trash">
+                                                                <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                                                            </button>
+                                                        </a>
+                                                    {% endif %}
+                                                    <a class="text-decoration-none" href="{% url 'update-admin' admin.pk %}">
+                                                        <button class="button-admin-edit">
+                                                            <img class="solo-ico-2" src="{% static 'img/settings-12-16.png' %}" alt="">
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}

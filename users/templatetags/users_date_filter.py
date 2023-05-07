@@ -6,4 +6,4 @@ register = template.Library()
 @register.filter(name='format')
 def date_format(date: datetime):
     # if date == None: return 'Без посещений'
-    return date.strftime("%H:%M %d/%m/%Y")
+    return date.strftime("%d.%m.%Y %H:%M")

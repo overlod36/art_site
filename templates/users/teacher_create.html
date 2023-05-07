@@ -1,16 +1,18 @@
 {% extends "base_app/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
+
+    <div class="add-page">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Добавление преподавателя</legend>
+                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Добавление преподавателя</h3>
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Добавить</button>
+                <button type="submit" class="btn btn-info mt-2">Добавить</button>
             </div>
         </form>
     </div>
+
 {% endblock content %}

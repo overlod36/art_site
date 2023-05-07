@@ -9,22 +9,72 @@ class StudyGroupForm(forms.ModelForm):
         fields = ['number']
 
 class UserForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        self.fields['username'].label = ''
+        self.fields['username'].widget.attrs['placeholder'] = 'Логин'
+        self.fields['username'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['password'].label = ''
+        self.fields['password'].widget.attrs['placeholder'] = 'Пароль'
+        self.fields['password'].widget.attrs['class'] = 'form-control mb-4'
+
     class Meta:
         model = User
         fields = ['username', 'password']
-        labels = {'username': 'Логин', 'password': 'Пароль'}
 
 class StudentProfileForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(StudentProfileForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].label = ''
+        self.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+        self.fields['first_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['last_name'].label = ''
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['sur_name'].label = ''
+        self.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+        self.fields['sur_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['group'].widget.attrs['class'] = 'form-select'
+        self.fields['group'].label = ''
+
     class Meta:
         model = Student_Profile
         fields = ['first_name', 'last_name', 'sur_name', 'group']
 
 class TeacherProfileForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(TeacherProfileForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].label = ''
+        self.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+        self.fields['first_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['last_name'].label = ''
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['sur_name'].label = ''
+        self.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+        self.fields['sur_name'].widget.attrs['class'] = 'form-control mb-4'
+
     class Meta:
         model = Teacher_Profile
         fields = ['first_name', 'last_name', 'sur_name']
 
 class AdminProfileForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(AdminProfileForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].label = ''
+        self.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+        self.fields['first_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['last_name'].label = ''
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control mb-4'
+        self.fields['sur_name'].label = ''
+        self.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+        self.fields['sur_name'].widget.attrs['class'] = 'form-control mb-4'
+
     class Meta:
         model = Admin_Profile
         fields = ['first_name', 'last_name', 'sur_name']
@@ -44,5 +94,5 @@ class TeacherForm(MultiModelForm):
 class AdminForm(MultiModelForm):
     form_classes = {
         'user': UserForm,
-        'admin': AdminProfileForm
+        'admin': AdminProfileForm 
     }

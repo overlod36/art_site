@@ -28,6 +28,8 @@ def profile(request):
         context ['courses'] = Course.objects.filter(author = request.user.teacher_profile)
     elif hasattr(request.user, 'admin_profile'):
         context['students'] = [student for student in Student_Profile.objects.all().order_by('group')]
+        context['teachers'] = [teacher for teacher in Teacher_Profile.objects.all()]
+        context['admins'] = [admin for admin in Admin_Profile.objects.all()]
     return render(request, 'users/profile.html', context)
 
 class PasswordUpdateView(LoginRequiredMixin, UpdateView):
@@ -126,6 +128,24 @@ class TeacherUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'users/user_update.html'
     fields = ['first_name', 'last_name', 'sur_name']
 
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+        form = super(TeacherUpdateView, self).get_form(form_class)
+
+        form.fields['first_name'].label = ''
+        form.fields['first_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+
+        form.fields['last_name'].label = ''
+        form.fields['last_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия'
+
+        form.fields['sur_name'].label = ''
+        form.fields['sur_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+
+        return form
+
     def get_success_url(self):
         return reverse('main')
 
@@ -163,13 +183,31 @@ class AdminUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'users/user_update.html'
     fields = ['first_name', 'last_name', 'sur_name']
 
-    def dispatch(self, request):
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+        form = super(AdminUpdateView, self).get_form(form_class)
+
+        form.fields['first_name'].label = ''
+        form.fields['first_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+
+        form.fields['last_name'].label = ''
+        form.fields['last_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия'
+
+        form.fields['sur_name'].label = ''
+        form.fields['sur_name'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+
+        return form
+
+    def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponse(status=400)
         if not hasattr(request.user, 'admin_profile') or not request.user.is_superuser:
             return HttpResponse(status=400)
         else:
-            return super(AdminsListView, self).dispatch(request)
+            return super(AdminUpdateView, self).dispatch(request)
 
     def get_success_url(self):
         return reverse('main')
@@ -214,6 +252,23 @@ class StudentUpdateView(LoginRequiredMixin, UpdateView):
     model = Student_Profile
     template_name = 'users/user_update.html'
     fields = ['first_name', 'last_name', 'sur_name', 'group']
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(StudentUpdateView, self).get_form(form_class)
+        form.fields['first_name'].widget.attrs['placeholder'] = 'Имя'
+        form.fields['first_name'].label = ''
+        form.fields['first_name'].widget.attrs['class'] = 'form-control mb-2'
+        form.fields['last_name'].label=''
+        form.fields['last_name'].widget.attrs['placeholder'] = 'Фамилия' 
+        form.fields['last_name'].widget.attrs['class'] = 'form-control mb-2'
+        form.fields['sur_name'].label = ''
+        form.fields['sur_name'].widget.attrs['placeholder'] = 'Отчество'
+        form.fields['sur_name'].widget.attrs['class'] = 'form-control mb-2'
+        form.fields['group'].widget.attrs['class'] = 'form-select'
+        form.fields['group'].label=''
+        return form
 
     def get_success_url(self):
         return reverse('main')
