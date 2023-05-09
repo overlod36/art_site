@@ -1,0 +1,31 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+  <div class="pbl-gallery-page">
+    <h3 class="fw-normal m-3 mb-5" style="letter-spacing: 1px;">{{ gallery.title }}</h3>
+      {% if request.user.teacher_profile == gallery.author %}
+        <a href="{% url 'pub-pic-load' id=gallery.pk %}"><button class="button-img ms-3 mb-2"><img class="danger-ico" src="{% static 'img/slr-camera-16.png' %}" alt="">Загрузить изображения</button></a>
+      {% endif %}
+      {% if not content %}
+        <div class="nothing-message">
+            <a>Здесь пока ничего нет!</a>
+        </div> 
+      {% else %}
+        <div class="gallery-content">
+          <div class="row g-3">
+              {% for img in content %}
+                <div class="col-3 d-flex justify-content-center">
+                  <div class="card h-100" style="width: 18rem;">
+                    <img class="card-img-top gal-img" src="{{ img.public_img.url }}"/>
+                    <div class="card-body">
+                      <a> Описание: {{ img.description }} </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+          </div>
+          {% include "base_app/fb_pagination.html" %}
+        </div>
+      {% endif %}
+  </div>
+{% endblock content %}

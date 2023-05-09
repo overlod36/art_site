@@ -1,0 +1,29 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% load date_filter %}
+{% block head_st %} <link rel="stylesheet" type="text/css" href="{% static 'css/base/content-styles.css' %}"> {% endblock %}
+
+{% block content %}
+
+    <div class="news-page-content">
+        {% for new in news %}
+            <div class="news-container card" >
+                <div class="card-body">
+                    <div class="news-info">
+                        <div class="news-title">
+                            <h3 class="title-left">{{ new.title }}</h3>
+                            <a class="title-right btn-rnd" href="{% url 'delete-news' id=new.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                            <a class="title-right" href="{% url 'update-news' pk=new.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>
+                        </div>
+                        <p class="ann-small-text"> Дата публикации: {{ new.publish_date|format }}</p>
+                        <p class="ann-small-text"> Автор публикации: {{ new.author }} </p>
+                    </div>
+                    <div class="ck ck-content">
+                        {{ new.html|safe }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock content %}

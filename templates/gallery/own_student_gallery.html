@@ -5,17 +5,17 @@
 <div class="st-gallery-page-content">
 
     <h3>{{ gallery.title }}</h3>
-<div class='d-flex justify-content-between align-items-center'>
-    <a href="{% url 'pic-load' id=gallery.pk %}"><button class="button-img"><img class="danger-ico" src="{% static 'img/slr-camera-16.png' %}" alt="">Загрузить изображение</button></a>
+    <div class='d-flex justify-content-between align-items-center'>
+        <a href="{% url 'st-pic-load' id=gallery.pk %}"><button class="button-img"><img class="danger-ico" src="{% static 'img/slr-camera-16.png' %}" alt="">Загрузить изображение</button></a>
 
-    <form method="POST">
-        {% csrf_token %}
-        <div class="d-inline-flex flex-row">{{ form }}</div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-warning mb-2 mt-2">Статус галереи</button>
-        </div>
-    </form>
-</div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="d-inline-flex flex-row">{{ form }}</div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-warning mb-2 mt-2">Статус галереи</button>
+            </div>
+        </form>
+    </div>
 
 
     {% if not content %}

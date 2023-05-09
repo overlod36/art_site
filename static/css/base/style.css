@@ -225,6 +225,10 @@
     margin-top: 4vh;
 }
 
+.pbl-gallery-page{
+    margin-top: 4vh;
+}
+
 .gallery-content{
     padding-top: 20px;
     min-height: 77vh;
@@ -411,4 +415,26 @@
 .gal-img{
     max-height: 500px;
     width: auto;
+}
+
+.t-st{
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.nothing-message{
+    margin-top: 10vh;
+    margin-left: 2vw;
+}
+
+.lch-item{
+    display: flex;
+}
+
+.ls-item{
+    flex-grow:1;
+}
+
+.rs-item{
+    flex-grow:0;
 }

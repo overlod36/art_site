@@ -105,3 +105,11 @@ def st_pic_delete(sender, instance, *args, **kwargs):
 @receiver(pre_delete, sender=Student_Gallery)
 def st_gallery_delete(sender, instance, *args, **kwargs):
     file_methods.remove_folder(os.path.join(file_methods.PATH, 'content', 'student_galleries', f'{instance.student.user.username}'))
+
+@receiver(pre_delete, sender=Public_Picture)
+def pub_pic_delete(sender, instance, *args, **kwargs):
+    if instance.public_img: instance.public_img.delete()
+
+@receiver(pre_delete, sender=Public_Gallery)
+def public_gallery_delete(sender, instance, *args, **kwargs):
+    file_methods.remove_folder(os.path.join(file_methods.PATH, 'content', 'public_galleries', f'{instance.code_name}'))

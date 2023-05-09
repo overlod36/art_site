@@ -17,6 +17,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from users.decorators import check_profile_activation
+from users.models import Teacher_Profile
 
 @login_required(login_url='/login/')
 @check_profile_activation
@@ -145,3 +146,7 @@ def delete_news(request, id):
         return redirect('main')
     context = { 'item': news , 'name': 'новость' }
     return render(request, 'informing/news_delete.html', context)
+
+def author_news(request, id):
+    news = News_Announce.objects.filter(author=Teacher_Profile.objects.get(pk=id))
+    return render(request, 'informing/news_archive.html', context={'news': news})

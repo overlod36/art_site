@@ -1,9 +1,10 @@
 from typing import Any
 from django.db.models.query import QuerySet
+from django import forms
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from gallery_app.models import Student_Gallery, Student_Picture, Teacher_Picture
+from gallery_app.models import Student_Gallery, Student_Picture, Teacher_Picture, Public_Gallery, Public_Picture
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.generic import (
@@ -13,7 +14,8 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .forms import StudentGalleryStatusForm
+from django.views.generic.edit import FormView
+from .forms import StudentGalleryStatusForm, PublicGalleryFilesForm, PublicGalleryInfoForm
 from django.db.models import Q
 from django.core.paginator import Paginator
 
@@ -64,6 +66,33 @@ class StudentPictureDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('main')
+    
+class PublicGalleryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Public_Gallery
+    template_name = 'gallery/gallery_update.html'
+    fields = ['title', 'description']
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(PublicGalleryUpdateView, self).get_form(form_class)
+        form.fields['title'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['title'].widget.attrs['placeholder'] = 'Название галереи'
+        form.fields['description'].widget=forms.Textarea(attrs={'placeholder': 'Описание галереи', "rows":"8"})
+        form.fields['description'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['description'].label = ''
+        form.fields['title'].label = ''
+        return form
+
+    def get_success_url(self) -> str:
+        return reverse('profile')
+
+class PublicGalleryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Public_Gallery
+    template_name = 'gallery/gallery_delete.html'
+
+    def get_success_url(self) -> str:
+        return reverse('profile')
 
 @login_required(login_url='/login/')
 def get_student_gallery(request, id):
@@ -88,3 +117,43 @@ def get_student_gallery(request, id):
         return redirect('student-gallery', id=gallery.pk)
 
     return render(request, template, context)
+
+@login_required(login_url="/login/")
+def get_public_gallery(request, id):
+    page = request.GET.get('page', 1)
+    gal = Public_Gallery.objects.get(pk=id)
+    images = Public_Picture.objects.filter(public_gallery=gal).order_by('publish_date')
+    paginator = Paginator(images, per_page=4)
+    content = paginator.get_page(page)
+    context = {'content': content, 'images': images, 'gallery': gal}
+    template = 'gallery/public_gallery.html'
+    return render(request, template, context)
+
+@login_required(login_url='/login/')
+def create_public_gallery(request):
+    info_form = PublicGalleryInfoForm()
+    file_form = PublicGalleryFilesForm()
+
+    if request.method == 'POST':
+        pub_gal = Public_Gallery(title=request.POST['title'], 
+                                 description=request.POST['description'],
+                                 author=request.user.teacher_profile)
+        pub_gal.save()
+        if request.FILES:
+            for file in request.FILES.getlist('files'):
+                pic = Public_Picture(public_img=file, public_gallery=pub_gal)
+                pic.save()
+        return redirect('profile')
+
+    return render(request, 'gallery/public_gallery_create.html', context={'info_form': info_form, 'file_form': file_form})
+
+@login_required(login_url='/login/')
+def load_public_picture(request, id):
+    file_form = PublicGalleryFilesForm()
+    if request.method == 'POST':
+        if request.FILES:
+            for file in request.FILES.getlist('files'):
+                pic = Public_Picture(public_img=file, public_gallery=Public_Gallery.objects.get(pk=id))
+                pic.save()
+        return redirect('main')
+    return render(request, 'gallery/public_picture_load.html', context={'file_form': file_form})
