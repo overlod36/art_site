@@ -438,3 +438,7 @@
 .rs-item{
     flex-grow:0;
 }
+
+.img-kunt{
+    display: flex;
+}

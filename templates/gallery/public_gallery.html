@@ -17,8 +17,22 @@
                 <div class="col-3 d-flex justify-content-center">
                   <div class="card h-100" style="width: 18rem;">
                     <img class="card-img-top gal-img" src="{{ img.public_img.url }}"/>
-                    <div class="card-body">
-                      <a> Описание: {{ img.description }} </a>
+                    <div class="card-body img-kunt">
+                      <div class="ls-item pt-2">
+                        <a class="text-decoration-none link-secondary" href="#">{{ img.title }}</a>
+                      </div>
+                      <div class="rs-item">
+                          <a class="text-decoration-none" href="{% url 'public-picture-del' img.pk %}">
+                              <button class="button-admin-trash">
+                                  <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                              </button>
+                          </a>
+                          <a class="text-decoration-none" href="{% url 'public-picture-upd' img.pk %}">
+                              <button class="button-admin-edit">
+                                  <img class="solo-ico-2" src="{% static 'img/settings-12-16.png' %}" alt="">
+                              </button>
+                          </a>
+                      </div>
                     </div>
                   </div>
                 </div>

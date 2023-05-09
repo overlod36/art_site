@@ -1,12 +1,16 @@
 {% extends "base_app/base.html" %}
 {% block content %}
 
-<p>Вы действительно хотите удалить изображение?</p>
-<form action="" method="POST">
-    {% csrf_token %}
-    <a href="{% url 'main' %}">Отмена</a>
-    <input type="submit" name="Confirm" value="Подтвердить">
+<div class="delete-page">
 
-</form>
+    <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Вы действительно хотите удалить изображение?</h3>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-success" type="submit">Подтвердить</button>
+        <a href="{% url 'profile' %}"><button class="btn btn-secondary" type="button">Отмена</button></a>
+    </form>
+
+
+</div>
 
 {% endblock content %}

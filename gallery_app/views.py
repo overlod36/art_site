@@ -94,6 +94,55 @@ class PublicGalleryDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self) -> str:
         return reverse('profile')
 
+class PublicPictureUpdateView(LoginRequiredMixin, UpdateView):
+    model = Public_Picture
+    template_name = 'gallery/picture_update.html'
+    fields = ['title', 'description']
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(PublicPictureUpdateView, self).get_form(form_class)
+        form.fields['title'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['title'].widget.attrs['placeholder'] = 'Название картины'
+        form.fields['description'].widget=forms.Textarea(attrs={'placeholder': 'Описание картины', "rows":"8"})
+        form.fields['description'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['description'].label = ''
+        form.fields['description'].required=False
+        form.fields['title'].label = ''
+        return form
+    
+    def get_success_url(self) -> str:
+        return reverse('profile')
+    
+class StudentPictureUpdateView(LoginRequiredMixin, UpdateView):
+    model = Student_Picture
+    template_name = 'gallery/picture_update.html'
+    fields = ['title', 'description']
+
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(StudentPictureUpdateView, self).get_form(form_class)
+        form.fields['title'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['title'].widget.attrs['placeholder'] = 'Название картины'
+        form.fields['description'].widget=forms.Textarea(attrs={'placeholder': 'Описание картины', "rows":"8"})
+        form.fields['description'].widget.attrs['class'] = 'form-control mb-4'
+        form.fields['description'].label = ''
+        form.fields['description'].required=False
+        form.fields['title'].label = ''
+        return form
+    
+    def get_success_url(self) -> str:
+        return reverse('profile')
+
+class PublicPictureDeleteView(LoginRequiredMixin, DeleteView):
+    model = Public_Picture
+    template_name = 'gallery/picture_delete.html'
+
+    def get_success_url(self):
+        return reverse('main')
+
 @login_required(login_url='/login/')
 def get_student_gallery(request, id):
     page = request.GET.get('page', 1)
@@ -106,9 +155,7 @@ def get_student_gallery(request, id):
     context = {'content': content, 'images': images, 'gallery': gallery}
     template = 'gallery/student_gallery.html'
     if hasattr(request.user, 'student_profile'):
-        if request.user.student_profile == gallery.student:
-            context['form'] = form
-            template = 'gallery/own_student_gallery.html'
+        if request.user.student_profile == gallery.student: context['form'] = form
         
     if request.method == 'POST':
         # доп проверка?
