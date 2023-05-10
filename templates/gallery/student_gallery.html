@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
   <div class="st-gallery-page-content">
-    <h3>{{ gallery.title }}</h3>
+    <h3 class="fw-normal m-3 mb-5" style="letter-spacing: 1px;">{{ gallery.title }}</h3>
     {% if request.user.student_profile == gallery.student %} 
       <div class='d-flex justify-content-between align-items-center'>
         <a href="{% url 'st-pic-load' id=gallery.pk %}"><button class="button-img"><img class="danger-ico" src="{% static 'img/slr-camera-16.png' %}" alt="">Загрузить изображение</button></a>
@@ -27,7 +27,7 @@
                 <img class="card-img-top gal-img" src="{{ img.student_img.url }}"/>
                 <div class="card-body img-kunt">
                   <div class="ls-item pt-2">
-                    <a class="text-decoration-none link-secondary" href="#">{{ img.title }}</a>
+                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="text-decoration-none link-secondary" href="#">{{ img.title }}</a>
                   </div>
                   {% if request.user.student_profile == gallery.student %} 
                     <div class="rs-item">
@@ -47,9 +47,36 @@
               </div>
             </div>
           {% endfor %}
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title fw-normal w-100 text-center" id="ModalLabel" style="letter-spacing: 1px;"></h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body img-modal-body mb-2">
+                  <img id="modal-image" class="modal-pic"/>
+                </div>
+                <!-- <div class="modal-footer">
+                  <a id="img-description"></a>
+                </div> -->
+              </div>
+            </div>
+          </div>
         </div>
         {% include "base_app/fb_pagination.html" %}
       </div>
     {% endif %}
   </div>
 {% endblock content %}
+
+{% block script %}
+  <script>
+    $('.card a').on('click', function(){
+      var image_url = $(this).parent().parent().prev().attr('src');
+      var image_title = $(this).html();
+      $('#modal-image').attr('src', image_url);
+      $('#ModalLabel').text(image_title); 
+    });
+  </script>
+{% endblock script %}

@@ -47,6 +47,15 @@ class Lecture(models.Model):
         name, extension = os.path.splitext(self.file.name)
         return extension
 
+class Task(models.Model):
+    name = models.CharField(verbose_name='Название задания', max_length=50, blank=False)
+    description = models.TextField(verbose_name='Описание задания')
+    course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата задания')
+    status = models.CharField(verbose_name="Статус задания", max_length=50, choices=TASK_STATUS)
+
+
+
 class Test(models.Model):
     name = models.CharField(verbose_name='Название теста', max_length=50, blank=False)
     duration = models.DurationField(verbose_name='Длительность теста')

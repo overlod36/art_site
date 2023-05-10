@@ -442,3 +442,13 @@
 .img-kunt{
     display: flex;
 }
+
+.modal-pic{
+    max-width: 80%;
+    max-height: 640px;
+}
+
+.img-modal-body{
+    display: flex;
+    justify-content: center;
+}
