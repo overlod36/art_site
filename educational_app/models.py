@@ -47,13 +47,18 @@ class Lecture(models.Model):
         name, extension = os.path.splitext(self.file.name)
         return extension
 
-class Task(models.Model):
-    name = models.CharField(verbose_name='Название задания', max_length=50, blank=False)
-    description = models.TextField(verbose_name='Описание задания')
-    course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
-    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата задания')
-    status = models.CharField(verbose_name="Статус задания", max_length=50, choices=TASK_STATUS)
+# class Task(models.Model):
+#     name = models.CharField(verbose_name='Название задания', max_length=50, blank=False)
+#     description = models.TextField(verbose_name='Описание задания')
+#     course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
+#     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата задания')
+#     status = models.CharField(verbose_name="Статус задания", max_length=50, choices=TASK_STATUS)
 
+# class Task_Attempt(models.Model):
+#     task = models.ForeignKey(Task, verbose_name='Задание', on_delete=models.CASCADE)
+#     student = models.ForeignKey(Student_Profile, verbose_name='Студент', on_delete=models.CASCADE)
+#     status = models.CharField(verbose_name="Статус решения задания", max_length=50, choices=TASK_ATTEMPT_STATUS)
+#     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения задания')
 
 
 class Test(models.Model):
@@ -62,7 +67,7 @@ class Test(models.Model):
     course = models.ForeignKey(Course, null=False, verbose_name='Дисциплина', on_delete=models.CASCADE)
     file = models.FileField(upload_to=file_methods.get_test_file_path, null=False, validators=[FileExtensionValidator(['json'])])
     status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
-    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата теста')
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения теста')
 
     @property
     def filepath(self):
@@ -98,6 +103,10 @@ class Test_Mark(Mark):
     @property
     def percent(self):
         return "%.1f" % ((self.points / self.max_points)* 100)  
+
+# class Task_Mark(Mark):
+#     task = models.ForeignKey(Task, null=False, verbose_name='Тест', on_delete=models.CASCADE)
+#     task_attempt = models.OneToOneField(Task_Attempt, null=True, verbose_name='Попытка выполнения задания', on_delete=models.CASCADE)
 
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):

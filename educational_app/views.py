@@ -23,6 +23,7 @@ from . import file_methods
 import os
 from django.core.files import File
 from django.db.models import Sum
+from django.views.decorators.cache import cache_control
 
 class LectureCreateView(LoginRequiredMixin, CreateView):
     model = Lecture
@@ -117,13 +118,16 @@ def get_test(request, id):
     
     if hasattr(request.user, 'student_profile'):
         if test.status == "PROCESS" or test.status == "CLOSED":
-            return HttpResponse(status=400)
+            response = HttpResponse('Тест не доступен!')
+            return response
         ta_check = [at[0] for at in Test_Attempt.objects.filter(student=request.user.student_profile).filter(test=test).values_list('status')]
         if 'CHECK' in ta_check or 'ACCESS' in ta_check:
+            # response = HttpResponse('This page cannot be accessed again.')
+            # return response
             return redirect('course-view', id=test.course.pk)
         form = QuizShowForm(questions=test_f['questions'])
         temp = 'educational/test.html'
-        context = {'form': form}
+        context = {'form': form, 'time': test.duration.total_seconds(), 'test': test.pk}
     elif hasattr(request.user, 'teacher_profile'):
         if test.status == "PROCESS":
             publish_check = QuizPublishForm()
@@ -143,11 +147,12 @@ def get_test(request, id):
             del res['csrfmiddlewaretoken']
             del res['quiz_show']
             test_list = test_methods.test_dict_to_list(test_f['questions'])
-            total_points = sum([question[2] for question in test_list])
-            solution = test_methods.generate_solution_file(test_list, test_methods.solution_dict_to_list(res))
-            form.save(solution, request.user, test)
-            res_points = sum([solution[ans][1] for ans in solution])
-            return render(request, 'educational/test_res.html', {'res': res_points, 'total': total_points})
+            solution = test_methods.generate_solution_file(test_list, test_methods.solution_dict(res))
+            print(res)
+            # form.save(solution, request.user, test)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest': return HttpResponse(json.dumps({'status': 1}), content_type='application/json')
+            else: return redirect('main')
+            # return render(request, 'educational/test_res.html', {'res': res_points, 'total': total_points})
         elif 'publish_st' in request.POST:
             test.status = 'DONE'
             test.save()

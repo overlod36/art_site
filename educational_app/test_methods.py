@@ -1,22 +1,31 @@
-def solution_dict_to_list(dit: dict):
-    return [(dit[key][0], key) for key in dit]
+def solution_dict(dit: dict) -> dict:
+    for key in dit: dit[key] = dit[key][0]
+    return dit
 
 def test_dict_to_list(lt: list):
-    return [(el['answer'], el['text'], el['mark'], el['choices']) if el['type'] == 'AO' else (el['answer'], el['text'], el['mark']) for el in lt]
+    return [(el['answer'], el['text'], el['mark'], el['type'], el['choices']) if el['type'] == 'AO' else (el['answer'], el['text'], el['mark'], el['type']) for el in lt]
 
-def generate_solution_file(test: list, solution: list):
+def generate_solution_file(test: list, solution: dict) -> dict:
     res = {}
-    for i in range(len(solution)):
-        match solution[i][1][0]:
-            case 'T':
-                if solution[i][0] == test[i][0]: res[test[i][1]] = [solution[i][0], test[i][2], test[i][2]]
-                else: res[test[i][1]] = [solution[i][0], 0, test[i][2]]
+    counter = [0, 0, 0]
+    for q in test:
+        match q[3]:
+            case 'TF':
+                counter[0] += 1
+                ans = solution[f'TF_{counter[0]}']
+                if ans == q[0]: res[q[1]] = [ans, q[2], q[2]]
+                else: res[q[1]] = [ans, 0, q[2]]
             case 'O':
-                if solution[i][0].lower() == test[i][0].lower(): res[test[i][1]] = [solution[i][0], test[i][2], test[i][2]]
-                else: res[test[i][1]] = [solution[i][0], 0, test[i][2]]
-            case 'A':
-                if int(solution[i][0]) == test[i][0]: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], test[i][2], test[i][2]]
-                else: res[test[i][1]] = [test[i][3][int(solution[i][0]) - 1], 0, test[i][2]]
+                counter[1] += 1
+                ans = solution[f'O_{counter[1]}']
+                if ans.lower() == q[0].lower(): res[q[1]] = [ans, q[2], q[2]]
+                else: res[q[1]] = [ans, 0, q[2]]
+            case 'AO':
+                counter[2] += 1
+                ans = solution[f'AO_{counter[2]}']
+                if ans == '': res[q[1]] = ['Без ответа', 0, q[2]]
+                elif int(ans) == q[0]: res[q[1]] = [q[4][int(ans)-1], q[2], q[2]]
+                else: res[q[1]] = [q[4][int(ans)-1], 0, q[2]]
     return res
 
 def get_test_attempt_list(dc: dict, q: list):

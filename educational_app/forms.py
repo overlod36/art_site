@@ -12,19 +12,21 @@ class QuizShowForm(Form):
     def __init__(self, questions, *args, **kwargs):
         super(QuizShowForm, self).__init__(*args, **kwargs)
         self.questions = questions
-        counter = 0
+        counter = [0, 0, 0]
         self.fields[f'quiz_show'] = forms.BooleanField(widget=forms.HiddenInput(), initial=True)
         for question in self.questions:
-            counter += 1
             match question['type']:
                 case 'TF':
-                    self.fields[f'TF_field_{counter}'] = forms.ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True, 
+                    counter[0] += 1
+                    self.fields[f'TF_{counter[0]}'] = forms.ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True, 
                                         choices=(('True', 'Да'), ('False', 'Нет')), widget=forms.RadioSelect)
                 case 'O':
-                    self.fields[f'O_field_{counter}'] = forms.CharField(label=f'{question["text"]} ({question["mark"]} баллов)', widget=forms.Textarea) 
+                    counter[1] += 1
+                    self.fields[f'O_{counter[1]}'] = forms.CharField(label=f'{question["text"]} ({question["mark"]} баллов)', widget=forms.Textarea) 
                 case 'AO':
+                    counter[2] += 1
                     choices = [(i, question['choices'][i-1]) for i in range(1, len(question['choices']) + 1)]
-                    self.fields[f'AO_field_{counter}'] = forms.ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True,
+                    self.fields[f'AO_{counter[2]}'] = forms.ChoiceField(label=f'{question["text"]} ({question["mark"]} баллов)', required=True,
                                            choices=choices, widget=forms.RadioSelect)
     
     def save(self, solution, user, test, *args, **kwargs):
