@@ -452,3 +452,35 @@
     display: flex;
     justify-content: center;
 }
+
+.edit-info-form input{
+    width: 45%;
+}
+
+.edit-question-form .mark-input{
+    width: 25%;
+}
+
+.edit-question-form .question-input{
+    width: 80%;
+}
+
+.test-constructor{
+    margin: 2vh;
+}
+
+.constructor-body{
+    display: flex;
+}
+
+.c-l-body{
+    flex-grow:1;
+}
+
+.c-r-body{
+    flex-grow:6;
+}
+
+.prep-question{
+    display: flex;
+}

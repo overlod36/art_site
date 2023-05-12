@@ -29,7 +29,7 @@
                             <ul class="collapse show nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
                                 {% for group in course.groups_list %}
                                     <li>
-                                        <a href="{% url 'course-gradebook' course.pk group.number %}" class="nav-link px-0"> <span class="ms-1 d-none d-sm-inline text-white">{{ group.number }}</span> </a>
+                                        <a href="#" class="nav-link px-0"> <span class="ms-1 d-none d-sm-inline text-white">{{ group.number }}</span> </a>
                                     </li>
                                 {% endfor %}
                             </ul>
@@ -120,11 +120,11 @@
                         {% for test in tests %}
                             <div class="course-material">
                                 {% if test.status == 'PROCESS' %}
-                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-q-32.png' %}" alt=""> {{ test.name }}</a>
+                                    <a href="{% url 'test' course.pk test.pk %}"> <img class="use-ico" src="{% static 'img/file-q-32.png' %}" alt=""> {{ test.title }}</a>
                                 {% elif test.status == 'DONE' %}
-                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-m-32.png' %}" alt=""> {{ test.name }}</a>
+                                    <a href="#"> <img class="use-ico" src="{% static 'img/file-m-32.png' %}" alt=""> {{ test.title }}</a>
                                 {% elif test.status == 'CLOSED' %}
-                                    <a href="{% url 'test' test.pk %}"> <img class="use-ico" src="{% static 'img/file-x-32.png' %}" alt=""> {{ test.name }}</a>
+                                    <a href="#"> <img class="use-ico" src="{% static 'img/file-x-32.png' %}" alt=""> {{ test.title }}</a>
                                 {% endif %}
                             </div>
                         {% endfor %}   

@@ -27,3 +27,8 @@ STUDENT_GALLERY_VISIBILITY = (
     ("INNER", "Внутренняя"),
     ("PUBLIC", "Открытая")
 )
+
+ANSWER_CORRECT = (
+    ('True', 'Правильный'),
+    ('False', 'Неправильный'),
+)

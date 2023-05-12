@@ -2,28 +2,72 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Тест</legend>
-                {% for field in form %}
-                    <div class="test-up_f">{{ field.label }}: {{ field }}</div>
-                {% endfor %}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Изменить</button>
+    <div class="test-constructor">
+        <div class="constructor-body">
+            <div class="c-l-body">
+                <h3 class="fw-normal mb-1 pb-3" style="letter-spacing: 1px;">Конструктор тестов</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="edit-info-form">
+                        {{ info_form }}
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary mt-2 mb-2">Сохранить</button>
+                        </div>
+                    </div>
+                </form>
+                <h5 class="fw-normal mt-3 mb-1" style="letter-spacing: 1px;">Добавление вопроса</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="edit-question-form">
+                        <div class="q-form-content">
+                            {{ q_form.question_st}}
+                            {{ q_form.text }}
+                            {{ q_form.mark }}
+                            <div class="ans-inputs">
+                                <div id="ans1" class="answer d-flex align-items-center w-100">
+                                    <div class="me-3">{{ q_form.answer }}</div> 
+                                    <div class="">{{q_form.answer_correction}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="new-ans-but" type="button" class="btn btn-success">Добавить вариант ответа</button>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary mt-2">Добавить</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                {{ publish }}
-            </fieldset>
-            <button class="button-password" type="submit" style="margin-bottom:50px;"><img class="danger-ico" src="{% static 'img/check-mark-3-16.png' %}" alt="">Опубликовать тест</button>
-        </form>
-        {% for q in questions %}
-            <div class="test-q"> Вопрос {{ q.text }} Количество баллов {{q.mark}} Правильный ответ {{q.answer}}</div>
-        {% endfor %}
+            <div class="c-r-body">
+                <div class="prepared-questions">
+                    {% for question in test.test_question_set.all %}
+                        <div class="prep-question w-100 border rounded-4 p-4 mb-2">
+                            <p>Вопрос: {{ question.text }}</p>
+                            <p>Баллы: {{ question.mark }} </p>
+                            <ul>
+                            {% for ans in question.test_answer_set.all %}
+                                <li>{{ ans.text }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}
+
+{% block script %}
+
+    <script>
+        $( "#new-ans-but" ).on("click", function() {
+            var numItems = $('.answer').length;
+            var element = $('#ans'+numItems).clone()
+            element.children().first().children().attr("id",'id_answer'+(numItems+1));
+            element.children().first().children().val('');
+            element.children().eq(1).children().attr("id",'id_answer_correction'+(numItems+1));
+            element.attr("id",'ans'+(numItems+1));
+            element.appendTo('.ans-inputs');
+        });
+    </script>
+
+{% endblock script %}
