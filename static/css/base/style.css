@@ -482,5 +482,28 @@
 }
 
 .prep-question{
+    display: grid;
+    grid-template-columns: 50% 40% 10%;
+}
+
+/* .prep-q-l{
+    flex-grow:1;
+}
+
+.prep-q-r{
+    flex-grow:4;
+} */
+
+.prep-q-ans{
+    display:inline-block;
+}
+
+.prep-q-ans{
+    width: 30%;
+}
+
+.prep-act{
     display: flex;
+    justify-content: center;
+    align-items: center
 }

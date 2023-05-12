@@ -12,6 +12,7 @@
                         {{ info_form }}
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary mt-2 mb-2">Сохранить</button>
+                            <button type="button" class="btn btn-success mt-2 mb-2">Опубликовать</button>
                         </div>
                     </div>
                 </form>
@@ -26,7 +27,7 @@
                             <div class="ans-inputs">
                                 <div id="ans1" class="answer d-flex align-items-center w-100">
                                     <div class="me-3">{{ q_form.answer }}</div> 
-                                    <div class="">{{q_form.answer_correction}}</div>
+                                    <div>{{q_form.answer_correction}}</div>
                                 </div>
                             </div>
                         </div>
@@ -41,13 +42,27 @@
                 <div class="prepared-questions">
                     {% for question in test.test_question_set.all %}
                         <div class="prep-question w-100 border rounded-4 p-4 mb-2">
-                            <p>Вопрос: {{ question.text }}</p>
-                            <p>Баллы: {{ question.mark }} </p>
-                            <ul>
-                            {% for ans in question.test_answer_set.all %}
-                                <li>{{ ans.text }}</li>
-                            {% endfor %}
-                            </ul>
+                            <div class="prep-q-l">
+                                <p>Вопрос №{{forloop.counter}}: {{ question.text }}</p>
+                                <p>Кол-во баллов: {{ question.mark }} </p>
+                            </div>
+                            <div class="prep-q-r">
+                                <p>Варианты ответов:</p>
+                                <div class="list-group prep-q-ans">
+                                    {% for ans in question.test_answer_set.all %}
+                                        {% if ans.is_correct %}
+                                            <a class="list-group-item list-group-item-success mb-0 text-center">{{ ans.text }}</a>
+                                        {% else %}
+                                            <a class="list-group-item list-group-item-danger mb-0 text-center">{{ ans.text }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="prep-act">
+                                <button class="button-admin-trash" style="height:36px;">
+                                    <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                                </button>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>

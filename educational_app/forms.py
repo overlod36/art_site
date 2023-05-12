@@ -76,7 +76,7 @@ class TestQuestionForm(Form):
     question_st = forms.CharField(widget=forms.HiddenInput)
     text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Текст вопроса', 'class':'form-control mb-2 mt-4 question-input'}), label='')
     mark = forms.IntegerField(label='Количество баллов', widget=forms.NumberInput(attrs={'placeholder': 'Баллы', 'min': '1', 'class':'form-control mb-2 mark-input'}))
-    answer = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Вариант ответа', 'class':'form-control mb-2 mt-2 answer-input'}), label='')
-    answer_correction = forms.ChoiceField(choices=choices.ANSWER_CORRECT, widget=forms.Select(attrs={'class':'form-control form-select'}))
+    answer = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Вариант ответа', 'class':'form-control mb-4 mt-2 answer-input'}), label='')
+    answer_correction = forms.ChoiceField(choices=choices.ANSWER_CORRECT, widget=forms.Select(attrs={'class':'form-control form-select mb-3'}))
 
     
