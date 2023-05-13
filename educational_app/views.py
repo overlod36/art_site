@@ -14,7 +14,7 @@ from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
-from .forms import QuizShowForm, QuizPublishForm, QuizAttemptCheckForm, QuizAttemptDeniedForm, TestInfoForm, TestQuestionForm
+from .forms import QuizShowForm, QuizPublishForm, QuizAttemptCheckForm, QuizAttemptDeniedForm, TestInfoForm, TestQuestionForm, TestPublishForm
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -119,6 +119,14 @@ class TestCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 @login_required(login_url='/login/')
+def delete_question(request, course_id, test_id, pk):
+    question = Test_Question.objects.get(pk=pk)
+    if request.method == 'POST':
+        question.delete()
+        return redirect('test-update', course_id=course_id, test_id=test_id)
+    return render(request, 'educational/question_delete.html')
+
+@login_required(login_url='/login/')
 def get_lecture(request, id):
     lecture = Lecture.objects.get(pk=id)
     resp = HttpResponse(lecture.file, content_type='application/pdf')
@@ -130,9 +138,16 @@ def update_test(request, course_id, test_id):
     test = Test.objects.get(pk=test_id)
     InfoForm = TestInfoForm(instance=test)
     QuestionForm = TestQuestionForm()
+    PublishForm = TestPublishForm()
 
     if request.method == 'POST':
-        if 'question_st' in request.POST:
+        print(request.POST)
+        if 'publish_st' in request.POST:
+            # проверка на кол-во вопросов
+            test.status = 'DONE'
+            test.save(update_fields=['status'])
+            return redirect('course-view', id=course_id)
+        elif 'question_st' in request.POST:
             question = dict(request.POST)
             del question['csrfmiddlewaretoken']
             del question['question_st']
@@ -150,12 +165,18 @@ def update_test(request, course_id, test_id):
                                               text=answer[0],
                                               is_correct=answer[1])
                     test_answer.save()
-            return redirect('test-update', course_id=course_id, test_id=test_id)
         elif 'info_st' in request.POST:
-            print('NO')
+            question = dict(request.POST)
+            del question['csrfmiddlewaretoken']
+            del question['info_st']
+            test.title = question['title'][0]
+            test.duration = question['duration'][0]
+            test.save(update_fields=['title', 'duration'])
+        return redirect('test-update', course_id=course_id, test_id=test_id)
 
     return render(request, 'educational/test_update.html', context={'q_form': QuestionForm,
                                                                     'info_form': InfoForm,
+                                                                    'publish_form': PublishForm,
                                                                     'test': test})
 
 @login_required(login_url='/login/')

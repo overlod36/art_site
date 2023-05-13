@@ -12,6 +12,7 @@ urlpatterns = [
     path('course/<int:course_id>/test/<int:test_id>', views.get_test, name='test'),
     path('course/<int:id>/test/create', views.TestCreateView.as_view(), name='test-create'),
     path('course/<int:course_id>/test/<int:test_id>/update', views.update_test, name='test-update'),
+    path('course/<int:course_id>/test/<int:test_id>/question/delete/<pk>', views.delete_question, name='question-delete'),
     # path('test/<int:id>', views.get_test, name='test'),
     # path('test-attempt/<int:id>', views.get_test_attempt, name='test-attempt'),
     # path('test/<int:id>/close', views.close_test, name='test-close')

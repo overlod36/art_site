@@ -29,6 +29,6 @@ STUDENT_GALLERY_VISIBILITY = (
 )
 
 ANSWER_CORRECT = (
-    ('True', 'Правильный'),
     ('False', 'Неправильный'),
+    ('True', 'Правильный'),
 )

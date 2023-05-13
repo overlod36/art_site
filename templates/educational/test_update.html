@@ -11,12 +11,16 @@
                     <div class="edit-info-form">
                         {{ info_form }}
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary mt-2 mb-2">Сохранить</button>
-                            <button type="button" class="btn btn-success mt-2 mb-2">Опубликовать</button>
+                            <button type="submit" class="btn btn-primary mt-2 mb-1">Сохранить</button>
                         </div>
                     </div>
                 </form>
-                <h5 class="fw-normal mt-3 mb-1" style="letter-spacing: 1px;">Добавление вопроса</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ publish_form }}
+                    <button type="submit" class="btn btn-success mt-1 mb-2">Опубликовать</button>
+                </form>
+                <h5 class="fw-normal mt-2 mb-1" style="letter-spacing: 1px;">Добавление вопроса</h5>
                 <form method="POST">
                     {% csrf_token %}
                     <div class="edit-question-form">
@@ -41,7 +45,7 @@
             <div class="c-r-body">
                 <div class="prepared-questions">
                     {% for question in test.test_question_set.all %}
-                        <div class="prep-question w-100 border rounded-4 p-4 mb-2">
+                        <div class="prep-question w-100 border rounded-4 p-4 mb-2 align-items-sm-center">
                             <div class="prep-q-l">
                                 <p>Вопрос №{{forloop.counter}}: {{ question.text }}</p>
                                 <p>Кол-во баллов: {{ question.mark }} </p>
@@ -59,9 +63,11 @@
                                 </div>
                             </div>
                             <div class="prep-act">
-                                <button class="button-admin-trash" style="height:36px;">
-                                    <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
-                                </button>
+                                <a class="text-decoration-none" href="{% url 'question-delete' test.course.pk test.pk question.pk %}">
+                                    <button class="button-admin-trash" style="height:36px;">
+                                        <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     {% endfor %}
@@ -74,7 +80,7 @@
 {% block script %}
 
     <script>
-        $( "#new-ans-but" ).on("click", function() {
+        $("#new-ans-but").on("click", function() {
             var numItems = $('.answer').length;
             var element = $('#ans'+numItems).clone()
             element.children().first().children().attr("id",'id_answer'+(numItems+1));
