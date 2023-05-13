@@ -1,8 +1,80 @@
 {% extends "base_app/base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% block head_st %}
+    <link rel="stylesheet" href="{% static 'css/js/jquery.countdown.css' %}">
+    <script src="{% static 'js/jquery-serialize-all.js' %}"></script>
+    <script src="{% static 'js/jquery.plugin.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown-ru.js' %}"></script>
+{% endblock head_st %}
 {% block content %}
     <div class="add-page">
-        <h3>Тест!!!</h3>
+        <div id="noDays"></div>
+        <form method="POST" id="test-form">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Тест</legend>
+                {% for field in form %}
+                    {% if field.label != 'Quiz show' %}
+                        {{ field.label }}
+                        {{ field }}
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    <p></p>
+                {% endfor %}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Отправить</button>
+            </div>
+        </form>
     </div>
 {% endblock content %}
+
+{% block script %}
+
+{{ time|json_script:"timer" }}
+{{ test|json_script:"test_id" }}
+<script>
+    $(function () {
+        var time, local_time;
+        if (performance.navigation.type != performance.navigation.TYPE_RELOAD) {
+            localStorage.removeItem('time');
+        }
+        time = JSON.parse(document.getElementById('timer').textContent);
+        local_time = localStorage.getItem('time');
+        if (local_time){
+            $('#noDays').countdown({until: local_time, compact: true, 
+                format: 'HMS', description: '', onExpiry: liftOff});
+        }
+        else{
+            $('#noDays').countdown({until: time, compact: true, 
+                format: 'HMS', description: '', onExpiry: liftOff});
+        }
+    });
+
+    function liftOff() {
+        var id = JSON.parse(document.getElementById('test_id').textContent);
+        localStorage.removeItem('time');
+        $.ajax({
+            type: "POST",
+            data: $('#test-form').serializeAll(),
+            url: id,
+            success: function (data) { 
+                if (data.status == 1){
+                    window.location.replace("{% url 'main' %}");
+                }}
+        });
+    }   
+    
+    $(window).on('beforeunload', function(){
+        var hms = $('#noDays').text().split(':');
+        var res = (+hms[0]) * 60 * 60 + (+hms[1]) * 60 + (+hms[2]);
+        localStorage.setItem('time', res);
+    });
+
+
+</script>
+
+{% endblock script %}

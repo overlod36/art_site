@@ -499,3 +499,7 @@
     flex-direction: column;
     align-items: center;
 }
+
+.attempts-list{
+    width: 20%;
+}

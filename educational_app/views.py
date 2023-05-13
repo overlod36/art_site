@@ -9,12 +9,12 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Course, Lecture, Test, Test_Question, Test_Answer
+from .models import Course, Lecture, Test, Test_Question, Test_Answer, Test_Attempt, Test_Attempt_Answer
 from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
-from .forms import QuizShowForm, QuizPublishForm, QuizAttemptCheckForm, QuizAttemptDeniedForm, TestInfoForm, TestQuestionForm, TestPublishForm
+from .forms import TestShowForm, TestAttemptCheckForm, TestAttemptDeniedForm, TestInfoForm, TestQuestionForm, TestPublishForm
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -23,6 +23,7 @@ from . import file_methods
 import os
 from django.core.files import File
 from django.db.models import Sum
+from django.db.models import Q
 from django.views.decorators.cache import cache_control
 
 class LectureCreateView(LoginRequiredMixin, CreateView):
@@ -134,6 +135,81 @@ def get_lecture(request, id):
     return resp
 
 @login_required(login_url='/login/')
+def get_test_attempts(request, course_id, test_id):
+    context = {'students':[], 'course_id': course_id, 'test_id': test_id}
+    test = Test.objects.get(pk=test_id)
+    attempts = Test_Attempt.objects.filter(test=test)
+    for student in Student_Profile.objects.filter(group__in=test.course.groups.all()):
+        context['students'].append([student, Test_Attempt.objects.filter(Q(test=test) & Q(student=student))])
+    return render(request, 'educational/test-attempt-list.html', context)
+
+@login_required(login_url='/login/')
+def get_test_attempt(request, course_id, test_id, attempt_id):
+    attempt = Test_Attempt.objects.get(pk=attempt_id)
+    answers = []
+    for answer in attempt.test_attempt_answer_set.all():
+        points = 0
+        if answer.is_correct: points = answer.question.mark
+        answers.append([answer.question.text, answer.answer, [ans.text for ans in answer.question.test_answer_set.filter(is_correct=True)][0], answer.question.mark, points])
+    return render(request, 'educational/test_attempt.html', context={'answers': answers})
+
+@login_required(login_url='/login/')
+def check_test_attempt(request, course_id, test_id, attempt_id):
+    attempt = Test_Attempt.objects.get(pk=attempt_id)
+    form = TestAttemptCheckForm(attempt)
+    denied = TestAttemptDeniedForm()
+    answers = [[answer.question.text, answer.answer, [ans.text for ans in answer.question.test_answer_set.filter(is_correct=True)][0], answer.question.mark, str(answer.question.pk)] for answer in attempt.test_attempt_answer_set.all()]
+
+    if request.method == 'POST':
+        if 'denied_st' in request.POST:
+            attempt.status = 'DENIED'
+            attempt.mark = 0
+            attempt.save(update_fields=['status', 'mark'])
+            return redirect('test-attempts', course_id=course_id, test_id=test_id)
+        else:
+            res = dict(request.POST)
+            del res['csrfmiddlewaretoken']
+            total_points = 0
+            for key in res: total_points += int(res[key][0])
+            attempt.status = 'ACCESS'
+            attempt.mark = total_points
+            attempt.save(update_fields=['status', 'mark'])
+            return redirect('test-attempts', course_id=course_id, test_id=test_id)
+
+
+    return render(request, 'educational/test_attempt_check.html', context={'form': form, 
+                                                                           'attempt': attempt,
+                                                                           'answers': answers,
+                                                                           'denied': denied})
+
+@login_required(login_url='/login/')
+def render_test(request, course_id, test_id):
+    test = Test.objects.get(pk=test_id)
+    form = TestShowForm(test=test)
+
+    if request.method == 'POST':
+        res = dict(request.POST)
+        del res['csrfmiddlewaretoken']
+        test_attempt = Test_Attempt(test=test, student=request.user.student_profile, status='CHECK', mark=0)
+        test_attempt.save()
+        total_points = 0
+        for key in res:
+            correct = False
+            question = Test_Question.objects.get(pk=int(key))
+            true_answers = [ans.text for ans in question.test_answer_set.filter(is_correct=True)]
+            answers = res[key]
+            if sorted(true_answers) == sorted(answers):
+                total_points += int(question.mark)
+                correct = True
+            attempt_answer = Test_Attempt_Answer(test_attempt=test_attempt, question=question, answer=answers[0], is_correct=correct)
+            attempt_answer.save()
+        test_attempt.mark = total_points
+        test_attempt.save(update_fields=['mark'])
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': return HttpResponse(json.dumps({'status': 1}), content_type='application/json')
+        else:  return redirect('course-view', id=course_id)
+    return render(request, 'educational/test_sample.html', context={'form':form, 'time': test.duration.total_seconds()})
+
+@login_required(login_url='/login/')
 def update_test(request, course_id, test_id):
     test = Test.objects.get(pk=test_id)
     InfoForm = TestInfoForm(instance=test)
@@ -199,6 +275,12 @@ def get_test(request, course_id, test_id):
         if test.course.author == request.user.teacher_profile:
             if test.status == 'PROCESS':
                 return redirect('test-update', course_id=course_id, test_id=test_id)
+            else:
+                return redirect('test-attempts', course_id=course_id, test_id=test_id)
+    elif hasattr(request.user, 'student_profile'):
+        if not Test_Attempt.objects.filter(student=request.user.student_profile).filter(Q(status='ACCESS') | Q(status='CHECK')):
+            return redirect('test-render', course_id=course_id, test_id=test_id)
+        return redirect('course-view', id=course_id)
 
     return render(request, 'educational/test_sample.html')
 

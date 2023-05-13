@@ -2,33 +2,39 @@
 {% load test_show %}
 {% load static %}
 {% block content %}
-
-    <form method="POST">
-        {% csrf_token %}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Проверка теста</legend>
-            {% for field in form %}
-                <div class="test-attempt-f">
-                    <a> Вопрос №{{forloop.counter}}: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:0 }} </a> 
+    <div class="add-page">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <h3 class="fw-normal mb-3 pb-1" style="letter-spacing: 1px;">Проверка теста</h3>
+                {% for answer in answers %}
+                    <a> Вопрос №{{forloop.counter}}: {{ answer.0 }} </a> 
                     <p></p>
-                    <a> Ответ: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:1 }}</a>
+                    <a> Ответ: {{ answer.1 }}</a>
                     <br/>
-                    <a> Правильный ответ: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:3 }} </a>
+                    <a> Правильный ответ: {{ answer.2 }} </a>
                     <br/>
-                    <a> Максимальное количество баллов: {{ ats|get_item_by_index:forloop.counter0|get_item_by_index:2 }} </a> {{ field }}
-                    <p></p>
-                </div>
-            {% endfor %}
-        </fieldset>
-        <div class="form-group">
-            <button class="btn btn-outline-info" type="submit" style="margin-bottom: 50px">Принять решение</button>
-        </div>
-    </form>
-    <form method="POST">
-        {% csrf_token %}
-        {{ denied }}
-        <div class="form-group">
-            <button class="btn btn-outline-danger" type="submit" style="margin-bottom: 50px">Отклонить решение</button>
-        </div>
-    </form>
+                    <a> Максимальное количество баллов: {{ answer.3 }} </a>
+                    {% with a_name=answer.4 %}
+                        {% for field in form %}
+                            {% if field.name == a_name %}
+                                {{ field }}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                    <p></p> 
+                {% endfor %}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info mb-2" type="submit">Принять решение</button>
+            </div>
+        </form>
+        <form method="POST">
+            {% csrf_token %}
+            {{ denied }}
+            <div class="form-group">
+                <button class="btn btn-outline-danger mb-2" type="submit">Отклонить решение</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

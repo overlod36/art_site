@@ -1,19 +1,20 @@
 {% extends "base_app/base.html" %}
-{% load test_show %}
 {% load static %}
 {% block content %}
 
-{% for ans in ats %}
-    <a> Вопрос №{{forloop.counter}}: {{ ans.0 }} </a> 
-    <p></p>
-    <a> Ответ: {{ ans.1 }}</a>
-    <br/>
-    <a> Правильный ответ: {{ ans.3 }} </a>
-    <br/>
-    <a> Максимальное количество баллов: {{ ans.2 }} </a>
-    <br/>
-    <a> Количество баллов: {{ ans.4 }}</a>
-    <p></p>
-{% endfor %}
+    <div class="add-page">
+        <h3 class="fw-normal mb-3 pb-1" style="letter-spacing: 1px;">Решение теста</h3>
+        {% for answer in answers %}
+            <a> Вопрос №{{forloop.counter}}: {{ answer.0 }} </a> 
+            <p></p>
+            <a> Ответ: {{ answer.1 }}</a>
+            <br/>
+            <a> Правильный ответ: {{ answer.2 }} </a>
+            <br/>
+            <a> Максимальное количество баллов: {{ answer.3 }} </a>
+            <a> Количество баллов: {{ answer.4 }} </a>
+            <p></p> 
+        {% endfor %}
+    </div>
 
 {% endblock content %}

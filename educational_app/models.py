@@ -89,11 +89,12 @@ class Test_Attempt(models.Model):
     student = models.ForeignKey(Student_Profile, verbose_name='Студент', on_delete=models.CASCADE)
     date_of_attempt = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения теста')
     status = models.CharField(verbose_name="Статус попытки", max_length=50, choices=TEST_ATTEMPT_STATUS)
+    mark = models.PositiveIntegerField()
 
 class Test_Attempt_Answer(models.Model):
     test_attempt = models.ForeignKey(Test_Attempt, verbose_name='Тестовая попытка', on_delete=models.CASCADE)
     question = models.ForeignKey(Test_Question, verbose_name='Тестовый вопрос', on_delete=models.CASCADE)
-    answer = models.ForeignKey(Test_Answer, verbose_name='Выбранный ответ', on_delete=models.CASCADE)
+    answer = models.TextField(verbose_name='Ответ')
     is_correct = models.BooleanField()
 
     class Meta:
