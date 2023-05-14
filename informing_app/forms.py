@@ -9,8 +9,6 @@ class OneCourseAnnounceForm(forms.ModelForm):
         model = Course_Announce
         fields = ['title', 'text']
     
-
-    
 class CourseAnnounceForm(forms.ModelForm):
     class Meta:
         model = Course_Announce

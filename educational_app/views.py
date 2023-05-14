@@ -9,12 +9,14 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Course, Lecture, Test, Test_Question, Test_Answer, Test_Attempt, Test_Attempt_Answer
+from .models import Course, Lecture, Test, Test_Question, Test_Answer, Test_Attempt, Test_Attempt_Answer, Task, Task_Attempt, Task_Attempt_File
 from informing_app.models import Course_Announce
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
-from .forms import TestShowForm, TestAttemptCheckForm, TestAttemptDeniedForm, TestInfoForm, TestQuestionForm, TestPublishForm
+from .forms import (TestForm, TaskForm, TestShowForm, 
+                    TestAttemptCheckForm, AttemptDeniedForm, TestInfoForm, 
+                    TestQuestionForm, TestPublishForm, TestAttemptFilesForm, TaskAttemptAcceptForm)
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -100,7 +102,7 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
         return reverse('main') 
 
 class TestCreateView(LoginRequiredMixin, CreateView):
-    form_class = TestInfoForm
+    form_class = TestForm
     template_name = 'educational/test_create.html'
  
     def dispatch(self, request, *args, **kwargs):
@@ -118,6 +120,122 @@ class TestCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.course = Course.objects.get(pk=self.pk)
         return super().form_valid(form)
+        
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    form_class = TaskForm
+    template_name = 'educational/task_create.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['course_id']
+            return super(TaskCreateView, self).dispatch(request)
+
+    def get_success_url(self):
+        return reverse('course-view', kwargs={'id': self.course})
+
+    def form_valid(self, form):
+        form.instance.course = Course.objects.get(pk=self.pk)
+        return super().form_valid(form)
+    
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = TaskForm
+    template_name = 'educational/task_update.html' 
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.pk = kwargs['pk']
+            self.course = kwargs['course_id']
+            return super(TaskUpdateView, self).dispatch(request)
+
+    def get_success_url(self):
+        return reverse('course-view', kwargs={'id': self.course})
+    
+    def get_queryset(self):
+        instance = Task.objects.filter(pk=self.pk)
+        return instance
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+@login_required(login_url='/login/')
+def get_task_attempts(request, course_id, task_id):
+    context = {'students':[], 'course_id': course_id, 'task_id': task_id}
+    task = Task.objects.get(pk=task_id)
+    attempts = Task_Attempt.objects.filter(task=task)
+    for student in Student_Profile.objects.filter(group__in=task.course.groups.all()):
+        context['students'].append([student, Task_Attempt.objects.filter(Q(task=task) & Q(student=student))])
+    return render(request, 'educational/task-attempts-list.html', context)
+
+@login_required(login_url='/login/')
+def get_task_attempt(request, course_id, task_id, attempt_id):
+    attempt = Task_Attempt.objects.get(pk=attempt_id)
+    files = attempt.task_attempt_file_set.all()
+    return render(request, 'educational/task_attempt.html', context={'files': files,
+                                                                     'c_id': course_id,
+                                                                     'task_id': task_id,
+                                                                     'a_id': attempt_id})
+                                                                           
+
+@login_required(login_url='/login/')
+def send_task_attempt(request, course_id, task_id):
+    if Task_Attempt.objects.filter(student=request.user.student_profile).filter(Q(status='CHECK')|Q(status='ACCESS')):
+        return redirect('course-view', course_id)
+    form = TestAttemptFilesForm()
+    task = Task.objects.get(pk=task_id)
+    if request.method == 'POST':
+        attempt = Task_Attempt(task=task, 
+                               student=request.user.student_profile,
+                               status="CHECK",
+                               mark=0)
+        attempt.save()
+        if request.FILES:
+            for file in request.FILES.getlist('files'):
+                task_file = Task_Attempt_File(task_attempt=attempt,
+                                              file=file)
+                task_file.save()
+        return redirect('course-view', course_id)
+
+    return render(request, 'educational/task_attempt_create.html', context={'form': form})
+
+@login_required(login_url='/login/')
+def get_task_attempt_file(request, course_id, task_id, attempt_id, file_id):
+    file = Task_Attempt_File.objects.get(pk=file_id)
+    resp = HttpResponse(file.file, content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="{ file.filename }"'
+    return resp
+
+@login_required(login_url='/login/')
+def check_task_attempt(request, course_id, task_id, attempt_id):
+    attempt = Task_Attempt.objects.get(pk=attempt_id)
+    files = attempt.task_attempt_file_set.all()
+    denied = AttemptDeniedForm()
+    accept = TaskAttemptAcceptForm(attempt.task.mark)
+
+    if request.method == 'POST':
+        if 'denied_st' in request.POST:
+            attempt.status = 'DENIED'
+            attempt.save(update_fields=['status'])
+        elif 'accepted_st' in request.POST:
+            res = request.POST
+            attempt.status = 'ACCESS'
+            attempt.mark = int(res['mark'][0])
+            attempt.save(update_fields=['status', 'mark'])
+        return redirect('task-attempts', course_id, task_id)
+
+    return render(request, 'educational/task_attempt_check.html', context={'denied':denied,
+                                                                           'accept': accept,
+                                                                           'files': files,
+                                                                           'c_id': course_id,
+                                                                           'task_id': task_id,
+                                                                           'a_id': attempt_id})
 
 @login_required(login_url='/login/')
 def delete_question(request, course_id, test_id, pk):
@@ -157,7 +275,7 @@ def get_test_attempt(request, course_id, test_id, attempt_id):
 def check_test_attempt(request, course_id, test_id, attempt_id):
     attempt = Test_Attempt.objects.get(pk=attempt_id)
     form = TestAttemptCheckForm(attempt)
-    denied = TestAttemptDeniedForm()
+    denied = AttemptDeniedForm()
     answers = [[answer.question.text, answer.answer, [ans.text for ans in answer.question.test_answer_set.filter(is_correct=True)][0], answer.question.mark, str(answer.question.pk)] for answer in attempt.test_attempt_answer_set.all()]
 
     if request.method == 'POST':
@@ -264,7 +382,8 @@ def get_course(request, id):
                   {'course': f_course, 
                    'lectures': Lecture.objects.filter(course=f_course).all(),
                    'announces': Course_Announce.objects.filter(course=f_course).order_by('-publish_date'),
-                   'tests': Test.objects.filter(course=f_course).all()})
+                   'tests': Test.objects.filter(course=f_course).all(),
+                   'tasks': Task.objects.filter(course=f_course).all()})
 
 @login_required(login_url='/login/')
 # @check_test_existence
@@ -278,57 +397,12 @@ def get_test(request, course_id, test_id):
             else:
                 return redirect('test-attempts', course_id=course_id, test_id=test_id)
     elif hasattr(request.user, 'student_profile'):
-        if not Test_Attempt.objects.filter(student=request.user.student_profile).filter(Q(status='ACCESS') | Q(status='CHECK')):
+        if not Test_Attempt.objects.filter(Q(student=request.user.student_profile)&Q(test=test)).filter(Q(status='ACCESS') | Q(status='CHECK')):
             return redirect('test-render', course_id=course_id, test_id=test_id)
         return redirect('course-view', id=course_id)
-
     return render(request, 'educational/test_sample.html')
 
 
-
-# @login_required(login_url='/login/')
-# def get_test_attempt(request, id):
-#     test_attempt = Test_Attempt.objects.get(pk=id)
-#     test = test_attempt.test
-#     with open(test_attempt.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
-#         test_at = json.load(json_file)
-#     with open(test.filepath, encoding='utf-8') as json_file:
-#         test_f = json.load(json_file)
-#     if test_attempt.status == 'CHECK': 
-#         temp = 'educational/test_attempt_check.html'
-#         context={'form': QuizAttemptCheckForm(test_at),
-#                  'denied': QuizAttemptDeniedForm(), 
-#                  'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])}
-#     else: 
-#         temp = 'educational/test_attempt.html'
-#         context={'ats': test_methods.get_test_attempt_list(test_at, test_f['questions'])}
-
-#     if request.method == 'POST':
-#         if 'denied_st' in request.POST:
-#             test_attempt.status = 'DENIED'
-#             test_attempt.save()
-#             return redirect('test', id=test.pk)
-#         else:
-#             res = [int(value[0]) for key, value in dict(request.POST).items() if key != 'csrfmiddlewaretoken']
-#             interm_file_path = os.path.join(file_methods.PATH, 'intermediate_content', 
-#                               f'{file_methods.get_transliteration(test.name)}.json')
-#             f = open(interm_file_path, 'a+', encoding='utf-8')
-#             res_str = json.dumps(test_methods.set_test_attempt(test_at, res), indent = 2, ensure_ascii=False)
-#             f.write(res_str)
-#             test_attempt.file.delete()
-#             test_attempt.file = File(f)
-#             test_attempt.status = 'ACCESS'
-#             test_attempt.save(update_fields=['file', 'status'])
-#             f.close()
-#             os.remove(interm_file_path)
-#             test_mark = Test_Mark(test=test, test_attempt=test_attempt, 
-#                                   student=test_attempt.student, 
-#                                   points=test_methods.get_test_attempt_points(test_at),
-#                                   max_points=test_methods.get_test_points(test_f))
-#             test_mark.save()
-#             return redirect('test', id=test.pk)
-
-#     return render(request, temp, context)
 
 # @login_required(login_url='/login/')
 # def close_test(request, id):

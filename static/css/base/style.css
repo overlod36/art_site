@@ -296,7 +296,7 @@
 }
 
 .course-section-title{
-    margin-bottom: 90px;
+    margin-bottom: 45px;
     text-align: center;
 }
 
@@ -501,5 +501,9 @@
 }
 
 .attempts-list{
+    width: 20%;
+}
+
+.at-mark-input{
     width: 20%;
 }

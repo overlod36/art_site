@@ -23,9 +23,11 @@ def transliterate(string):
 def get_transliteration(title):
     return transliterate(title.lower())
 
-
 def get_lecture_file_path(instance, filename):
     return os.path.join("%s" % 'educational_tapes', instance.course.code_name, 'lectures', filename)
+
+def get_task_file_path(instance, filename):
+    return os.path.join("%s" % 'educational_tapes', instance.task_attempt.task.course.code_name, 'tasks', instance.task_attempt.task.code_name, instance.task_attempt.student.user.username, filename)
 
 def get_test_file_path(instance, filename):
     filename = f'{get_transliteration(instance.name)}.json'

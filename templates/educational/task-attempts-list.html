@@ -1,0 +1,27 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% load date_filter %}
+{% block content %}
+
+    <div class="add-page">
+        {% for student in students %}
+            <h5 class="fw-normal mb-1 pb-1" style="letter-spacing: 1px;">{{ student.0.last_name }} {{ student.0.first_name }}</h5>
+            {% if not student.1 %}
+                <h5 class="mb-4">Задание не выполнено!</h5>
+            {% else %}
+                <div class="list-group attempts-list mb-2 mt-2">
+                    {% for attempt in student.1 %}
+                        {% if attempt.status == 'CHECK' %}
+                            <a href="{% url 'task-attempt-check' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-warning mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }} </a>
+                        {% elif attempt.status == 'DENIED' %}
+                            <a href="{% url 'task-attempt' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-danger mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }}</a>
+                        {% elif attempt.status == 'ACCESS' %}
+                            <a href="{% url 'task-attempt' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }} </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+{% endblock content %}

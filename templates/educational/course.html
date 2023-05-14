@@ -22,6 +22,11 @@
                             <i class="fs-4 bi-house"></i> <span id="bt-course-lectures" class="ms-1 d-none d-sm-inline text-white">Лекции</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link align-middle px-0">
+                            <i class="fs-4 bi-house"></i> <span id="bt-course-tasks" class="ms-1 d-none d-sm-inline text-white">Задания</span>
+                        </a>
+                    </li>
                     {% if request.user.teacher_profile %}
                         <li>
                             <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
@@ -75,6 +80,38 @@
                 <div class="add-material">
                     {% if request.user.teacher_profile %}
                         <a href="{% url 'lecture-upload' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить лекцию</button></a>
+                    {% endif %}
+                </div>
+            </div>
+            <div id="course-tasks" style="display:none;">
+                <div class="course-section-title"><h3>Задания</h3></div>
+                {% if tasks %}
+                    {% for task in tasks %}
+                        <div class="task-container card mb-2 pt-3 px-3">
+                            <div class="news-info">
+                                <div class="news-title">
+                                    <h3 class="title-left">{{ task.title }}</h3>
+                                    {% if request.user.student_profile %}
+                                        <a class="title-right" href="{% url 'task-attempt-create' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Отправить решение</button></a>
+                                    {% endif %}
+                                    {% if task.course.author.user == request.user %}
+                                        <a class="title-right btn-rnd" href="#"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                                        <a class="title-right btn-rnd" href="{% url 'task-update' task.course.pk task.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>
+                                        <a class="title-right" href="{% url 'task-attempts' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Решения</button></a>
+                                    {% endif %}
+                                </div>
+                                <p class="ann-small-text"> Дата публикации: {{ task.publish_date|format }}</p>
+                            </div>
+                            <div class="ck ck-content">
+                                {{ task.description|safe }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                {% endif %}
+                <div class="add-material">
+                    {% if request.user.teacher_profile %}
+                        <a href="{% url 'task-create' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить задание</button></a>
                     {% endif %}
                 </div>
             </div>
@@ -132,6 +169,11 @@
                 {% else %}
                     <a>Здесь пока ничего нет!</a>
                 {% endif %}
+                <div class="add-material">
+                    {% if request.user.teacher_profile %}
+                        <a href="{% url 'test-create' course.pk %}"><button class="button-password" style="margin-bottom:20px;"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Добавить тест</button></a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -145,16 +187,25 @@
             $("#course-lectures").show();
             $("#course-announces").hide();
             $("#course-tests").hide();
+            $("#course-tasks").hide();
         });
         $("#bt-course-announces").click(function() {
             $("#course-announces").show();
             $("#course-lectures").hide();
             $("#course-tests").hide();
+            $("#course-tasks").hide();
         });
         $("#bt-course-tests").click(function() {
             $("#course-tests").show();
             $("#course-lectures").hide();
             $("#course-announces").hide();
+            $("#course-tasks").hide();
+        });
+        $("#bt-course-tasks").click(function() {
+            $("#course-tests").hide();
+            $("#course-lectures").hide();
+            $("#course-announces").hide();
+            $("#course-tasks").show();
         });
 
     });

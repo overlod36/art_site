@@ -1,23 +1,22 @@
 {% extends "base_app/base.html" %}
-
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="add-page">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Добавление новости</h3>
+                <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Создание задания</h3>
                 {{ form.media }}
                 {{ form.as_p }}
             </fieldset>
             <div class="form-group">
-                <button type="submit" class="btn btn-info mt-2">Опубликовать</button>
+                <button type="submit" class="btn btn-info mt-1">Создать</button>
             </div>
         </form>
     </div>
 {% endblock content %}
-
 {% block script %}
 <script>
-    $('label[for="id_html"]').hide();
+    $('label[for="id_description"]').hide();
 </script>
 {% endblock script %}

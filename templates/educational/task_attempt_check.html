@@ -1,0 +1,28 @@
+{% extends "base_app/base.html" %}
+{% load test_show %}
+{% load static %}
+{% block content %}
+    <div class="add-page">
+
+        {% for file in files %}
+            <a href="{% url 'task-attempt-file' c_id task_id a_id file.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> 
+                {{ file.filename }} 
+            </a>
+        {% endfor %}
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ accept }}
+            <div class="form-group">
+                <button class="btn btn-outline-info mt-5 mb-2" type="submit">Принять решение</button>
+            </div>
+        </form>
+        <form method="POST">
+            {% csrf_token %}
+            {{ denied }}
+            <div class="form-group">
+                <button class="btn btn-outline-danger mb-2" type="submit">Отклонить решение</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

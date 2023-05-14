@@ -10,6 +10,7 @@ from . import file_methods
 from educational_art_site.choices import *
 import datetime
 from django.core.exceptions import ValidationError
+from django_ckeditor_5.fields import CKEditor5Field
 
 class Course(models.Model):
     title = models.CharField(verbose_name='Название дисциплины', max_length=50)
@@ -47,26 +48,43 @@ class Lecture(models.Model):
         name, extension = os.path.splitext(self.file.name)
         return extension
 
-# class Task(models.Model):
-#     name = models.CharField(verbose_name='Название задания', max_length=50, blank=False)
-#     description = models.TextField(verbose_name='Описание задания')
-#     course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
-#     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата задания')
-#     status = models.CharField(verbose_name="Статус задания", max_length=50, choices=TASK_STATUS)
+class Task(models.Model):
+    title = models.CharField(verbose_name='Название задания', max_length=50, blank=False)
+    code_name = models.CharField(blank=True, unique=True, max_length=50)
+    description = CKEditor5Field(config_name='extends')
+    course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата задания')
+    status = models.CharField(verbose_name="Статус задания", max_length=50, choices=TASK_STATUS)
+    mark = models.PositiveIntegerField()
 
-# class Task_Attempt(models.Model):
-#     task = models.ForeignKey(Task, verbose_name='Задание', on_delete=models.CASCADE)
-#     student = models.ForeignKey(Student_Profile, verbose_name='Студент', on_delete=models.CASCADE)
-#     status = models.CharField(verbose_name="Статус решения задания", max_length=50, choices=TASK_ATTEMPT_STATUS)
-#     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения задания')
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.status = 'PROCESS'
+            if not self.code_name:
+                self.code_name = file_methods.get_transliteration(getattr(self, 'title'))
+            file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'educational_tapes', self.course.code_name, 'tasks', self.code_name))
+        super(Task, self).save(*args, **kwargs)
 
+class Task_Attempt(models.Model):
+    task = models.ForeignKey(Task, verbose_name='Задание', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student_Profile, verbose_name='Студент', on_delete=models.CASCADE)
+    status = models.CharField(verbose_name="Статус решения задания", max_length=50, choices=TASK_ATTEMPT_STATUS)
+    publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения задания')
+    mark = models.PositiveIntegerField()
+
+class Task_Attempt_File(models.Model):
+    task_attempt = models.ForeignKey(Task_Attempt, verbose_name='Попытка задания', on_delete=models.CASCADE)
+    file = models.FileField(upload_to=file_methods.get_task_file_path)
+
+    @property
+    def filename(self):
+        return str(os.path.basename(self.file.name))
 
 class Test(models.Model):
     title = models.CharField(verbose_name='Название теста', max_length=150)
     duration = models.DurationField(verbose_name='Длительность теста')
     course = models.ForeignKey(Course, verbose_name='Дисциплина', on_delete=models.CASCADE)
     status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
-    # при save status
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикация теста')
 
     def save(self, *args, **kwargs):
@@ -103,6 +121,10 @@ class Test_Attempt_Answer(models.Model):
 @receiver(pre_delete, sender=Lecture)
 def delete_lecture_file(sender, instance, *args, **kwargs):
     if instance.file: instance.file.delete()
+
+# @receiver(pre_delete, sender=Task)
+# def delete_task_files(sender, instance, *args, **kwargs):
+#     pass
 
 @receiver(pre_delete, sender=Course)
 def delete_course_folder(sender, instance, *args, **kwargs):
