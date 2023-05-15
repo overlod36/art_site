@@ -1,0 +1,81 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% load date_filter %}
+{% block content %}
+    <div class="add-page">
+        {% for course in courses %}
+        <h3 class="fw-normal mb-3 pb-1" style="letter-spacing: 1px;">{{ course.0.title }}</h3>
+            {% for group in course.1 %}
+                <h5 class="fw-normal mb-3 pb-1" style="letter-spacing: 1px;">{{ group.0.number }}</h5>
+                <div class="group-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">Студент</th>
+                                {% for test in group.2 %}
+                                    <th scope="col" class="bg-success">{{ test.title }}</th>
+                                {% endfor %}
+                                {% for test in group.3 %}
+                                    <th scope="col" class="bg-warning">{{ test.title }}</th>
+                                {% endfor %}
+                                {% for task in group.4 %}
+                                    <th scope="col" class="bg-success">{{ task.title }}</th>
+                                {% endfor %}
+                                {% for task in group.5 %}
+                                    <th scope="col" class="bg-warning">{{ task.title }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in group.1 %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ student.0.last_name }} {{ student.0.first_name }}</td>
+                                    {% for closed_mark in student.1 %}
+                                        {% if closed_mark == 'no_att' %}
+                                            <td>0</td>
+                                        {% else %}
+                                            <td><a href="{% url 'test-attempt' closed_mark.test.course.pk closed_mark.test.pk closed_mark.pk %}">{{closed_mark.mark}} / {{closed_mark.test.mark}}</a><br/> 
+                                                {{closed_mark.test.publish_date|format}}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for done_mark in student.2 %}
+                                        {% if done_mark == 'no_att' %}
+                                            <td>Не сделано</td>
+                                        {% elif done_mark.status == 'CHECK' %}
+                                            <td><a href="{% url 'test-attempt-check' done_mark.test.course.pk done_mark.test.pk done_mark.pk %}">На проверке</a><br/> 
+                                                {{done_mark.test.publish_date|format}}</td>
+                                        {% else %}
+                                            <td><a href="{% url 'test-attempt' done_mark.test.course.pk done_mark.test.pk done_mark.pk %}">{{done_mark.mark}} / {{done_mark.test.mark}}</a><br/> 
+                                                {{done_mark.test.publish_date|format}}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for closed_mark in student.3 %}
+                                        {% if closed_mark == 'no_att' %}
+                                            <td>0</td>
+                                        {% else %}
+                                            <td><a href="{% url 'task-attempt' closed_mark.task.course.pk closed_mark.task.pk closed_mark.pk %}"></a>{{closed_mark.mark}} / {{closed_mark.task.mark}} <br/> 
+                                                {{closed_mark.task.publish_date|format}}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for done_mark in student.4 %}
+                                        {% if done_mark == 'no_att' %}
+                                            <td>Не сделано</td>
+                                        {% elif done_mark.status == 'CHECK' %}
+                                            <td><a href="{% url 'task-attempt-check' done_mark.task.course.pk done_mark.task.pk done_mark.pk %}">На проверке</a></td>
+                                        {% else %}
+                                            <td><a href="{% url 'task-attempt' done_mark.task.course.pk done_mark.task.pk done_mark.pk %}">{{done_mark.mark}} / {{done_mark.task.mark}}</a> <br/> 
+                                                {{done_mark.task.publish_date|format}}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+{% endblock content %}

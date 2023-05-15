@@ -28,6 +28,15 @@ class StudentGalleryListView(LoginRequiredMixin, ListView):
     def get_queryset(self) -> QuerySet[Any]:
         return Student_Gallery.objects.filter(Q(status='INNER') | Q(status='PUBLIC')).order_by('student__last_name')
 
+class PublicGalleryListView(LoginRequiredMixin, ListView):
+    model = Public_Gallery
+    template_name = 'gallery/public_galleries_list.html'
+    context_object_name = 'p_galleries'
+    paginate_by = 3
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return Public_Gallery.objects.all().order_by('title')
+
 class StudentPictureCreateView(LoginRequiredMixin, CreateView):
     model = Student_Picture
     template_name = 'gallery/picture_upload.html'

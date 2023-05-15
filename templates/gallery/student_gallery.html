@@ -27,7 +27,7 @@
                 <img class="card-img-top gal-img" src="{{ img.student_img.url }}"/>
                 <div class="card-body img-kunt">
                   <div class="ls-item pt-2">
-                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="text-decoration-none link-secondary" href="#">{{ img.title }}</a>
+                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="text-decoration-none link-secondary" href="#">{% if img.title %}{{ img.title }}{% else %}Без названия{% endif %}</a>
                   </div>
                   {% if request.user.student_profile == gallery.student %} 
                     <div class="rs-item">

@@ -27,19 +27,6 @@
                             <i class="fs-4 bi-house"></i> <span id="bt-course-tasks" class="ms-1 d-none d-sm-inline text-white">Задания</span>
                         </a>
                     </li>
-                    {% if request.user.teacher_profile %}
-                        <li>
-                            <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                <i class="fs-4 bi-speedometer2"></i> <span class="ms-1 d-none d-sm-inline text-white">Журналы групп</span> </a>
-                            <ul class="collapse show nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
-                                {% for group in course.groups_list %}
-                                    <li>
-                                        <a href="#" class="nav-link px-0"> <span class="ms-1 d-none d-sm-inline text-white">{{ group.number }}</span> </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
                     <li class="nav-item">
                         <a href="#" class="nav-link align-middle px-0">
                             <i class="fs-4 bi-house"></i> <span id="bt-course-tests" class="ms-1 d-none d-sm-inline text-white">Тесты</span>
@@ -87,25 +74,46 @@
                 <div class="course-section-title"><h3>Задания</h3></div>
                 {% if tasks %}
                     {% for task in tasks %}
-                        <div class="task-container card mb-2 pt-3 px-3">
-                            <div class="news-info">
-                                <div class="news-title">
-                                    <h3 class="title-left">{{ task.title }}</h3>
-                                    {% if request.user.student_profile %}
-                                        <a class="title-right" href="{% url 'task-attempt-create' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Отправить решение</button></a>
-                                    {% endif %}
-                                    {% if task.course.author.user == request.user %}
-                                        <a class="title-right btn-rnd" href="#"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
-                                        <a class="title-right btn-rnd" href="{% url 'task-update' task.course.pk task.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>
-                                        <a class="title-right" href="{% url 'task-attempts' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Решения</button></a>
-                                    {% endif %}
+                        {% if request.user.student_profile and task.status != 'PROCESS' %}
+                            <div class="task-container card mb-2 pt-3 px-3">
+                                <div class="news-info">
+                                    <div class="news-title">
+                                        <h3 class="title-left">{{ task.title }}</h3>
+                                        {% if request.user.student_profile %}
+                                            {% if task.status == 'DONE' %}
+                                                <a class="title-right" href="{% url 'task-attempt-create' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Отправить решение</button></a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <p class="ann-small-text"> Дата публикации: {{ task.publish_date|format }}</p>
                                 </div>
-                                <p class="ann-small-text"> Дата публикации: {{ task.publish_date|format }}</p>
+                                <div class="ck ck-content">
+                                    {{ task.description|safe }}
+                                </div>
                             </div>
-                            <div class="ck ck-content">
-                                {{ task.description|safe }}
+                        {% elif task.course.author.user == request.user %}
+                            <div class="task-container card mb-2 pt-3 px-3">
+                                <div class="news-info">
+                                    <div class="news-title">
+                                        <h3 class="title-left">{{ task.title }}</h3>
+                                        {% if task.status == 'PROCESS' %}
+                                            <a class="title-right btn-rnd" href="{% url 'task-delete' task.course.pk task.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/delete-16.png' %}" alt="">Удалить</button></a>
+                                            <a class="title-right btn-rnd" href="{% url 'task-update' task.course.pk task.pk %}"><button class="button-edit"><img class="danger-ico" src="{% static 'img/edit-2-16.png' %}" alt="">Редактировать</button></a>
+                                            <a class="title-right" href="{% url 'task-publish' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/folder-3-16 (1).png' %}" alt="">Опубликовать</button></a>
+                                        {% elif task.status == 'DONE' %}
+                                            <a class="title-right btn-rnd" href="{% url 'task-close' task.course.pk task.pk %}"><button class="button-trash"><img class="danger-ico" src="{% static 'img/x-mark-16.png' %}" alt="">Закрыть задание</button></a>
+                                            <a class="title-right" href="{% url 'task-attempts' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Решения</button></a>
+                                        {% elif task.status == 'CLOSED' %}
+                                            <a class="title-right" href="{% url 'task-attempts' task.course.pk task.pk %}"><button class="button-password"><img class="danger-ico" src="{% static 'img/books-16.png' %}" alt="">Решения</button></a>
+                                        {% endif %}
+                                    </div>
+                                    <p class="ann-small-text"> Дата публикации: {{ task.publish_date|format }}</p>
+                                </div>
+                                <div class="ck ck-content">
+                                    {{ task.description|safe }}
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 {% else %}
                 {% endif %}

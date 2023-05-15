@@ -40,8 +40,14 @@ class TestAttemptCheckForm(Form):
 class AttemptDeniedForm(Form):
     denied_st = forms.CharField(widget=forms.HiddenInput)
 
+class TestDeleteForm(Form):
+    delete_st = forms.CharField(widget=forms.HiddenInput)
+
 class TestPublishForm(Form):
     publish_st = forms.CharField(widget=forms.HiddenInput)
+
+class TestCloseForm(Form):
+    close_st = forms.CharField(widget=forms.HiddenInput)
 
 class TestInfoForm(ModelForm):
     info_st = forms.CharField(widget=forms.HiddenInput)

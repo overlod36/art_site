@@ -87,6 +87,13 @@ class Test(models.Model):
     status = models.CharField(verbose_name="Статус теста", max_length=50, choices=TEST_STATUS)
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикация теста')
 
+    @property
+    def mark(self):
+        total_points = 0
+        for question in self.test_question_set.all():
+            total_points += question.mark
+        return total_points
+
     def save(self, *args, **kwargs):
         if self._state.adding:
             self.status = 'PROCESS'
@@ -122,9 +129,14 @@ class Test_Attempt_Answer(models.Model):
 def delete_lecture_file(sender, instance, *args, **kwargs):
     if instance.file: instance.file.delete()
 
-# @receiver(pre_delete, sender=Task)
-# def delete_task_files(sender, instance, *args, **kwargs):
-#     pass
+@receiver(pre_delete, sender=Task_Attempt_File)
+def delete_task_attempt_files(sender, instance, *args, **kwargs):
+    if instance.file: instance.file.delete()
+
+@receiver(pre_delete, sender=Task)
+def delete_task_files(sender, instance, *args, **kwargs):
+    task_path = os.path.join(file_methods.PATH, 'content', 'educational_tapes', instance.course.code_name, 'tasks', instance.code_name)
+    file_methods.remove_folder(task_path)
 
 @receiver(pre_delete, sender=Course)
 def delete_course_folder(sender, instance, *args, **kwargs):

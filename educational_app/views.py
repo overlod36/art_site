@@ -16,7 +16,8 @@ from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
 from .forms import (TestForm, TaskForm, TestShowForm, 
                     TestAttemptCheckForm, AttemptDeniedForm, TestInfoForm, 
-                    TestQuestionForm, TestPublishForm, TestAttemptFilesForm, TaskAttemptAcceptForm)
+                    TestQuestionForm, TestPublishForm, TestAttemptFilesForm, 
+                    TaskAttemptAcceptForm, TestDeleteForm, TestCloseForm)
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -135,7 +136,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
             return super(TaskCreateView, self).dispatch(request)
 
     def get_success_url(self):
-        return reverse('course-view', kwargs={'id': self.course})
+        return reverse('course-view', kwargs={'id': self.pk})
 
     def form_valid(self, form):
         form.instance.course = Course.objects.get(pk=self.pk)
@@ -165,6 +166,41 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
+    model = Task
+    template_name = 'educational/task-delete.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=400)
+        if not hasattr(request.user, 'teacher_profile'):
+            return HttpResponse(status=400)
+        else:
+            self.course = kwargs['course_id']
+            return super(TaskDeleteView, self).dispatch(request)
+
+    def get_success_url(self) -> str:
+        return reverse('course-view', kwargs={'id': self.course})
+
+@login_required(login_url='/login/')
+def task_close(request, course_id, pk):
+    task = Task.objects.get(pk=pk)
+    if request.method == 'POST':
+        task.status = 'CLOSED'
+        task.save(update_fields=['status'])
+        return redirect('course-view', course_id)
+    return render(request, 'educational/task-close.html', context={'c_id': course_id})
+
+@login_required(login_url='/login/')
+def task_publish(request, course_id, pk):
+    task = Task.objects.get(pk=pk)
+    if request.method == 'POST':
+        # либо 0 баллов всем непроверенным, либо запрещать закрывать тест
+        task.status = 'DONE'
+        task.save(update_fields=['status'])
+        return redirect('course-view', course_id)
+    return render(request, 'educational/task-publish.html', context={'c_id': course_id})
+
 @login_required(login_url='/login/')
 def get_task_attempts(request, course_id, task_id):
     context = {'students':[], 'course_id': course_id, 'task_id': task_id}
@@ -183,7 +219,6 @@ def get_task_attempt(request, course_id, task_id, attempt_id):
                                                                      'task_id': task_id,
                                                                      'a_id': attempt_id})
                                                                            
-
 @login_required(login_url='/login/')
 def send_task_attempt(request, course_id, task_id):
     if Task_Attempt.objects.filter(student=request.user.student_profile).filter(Q(status='CHECK')|Q(status='ACCESS')):
@@ -254,11 +289,17 @@ def get_lecture(request, id):
 
 @login_required(login_url='/login/')
 def get_test_attempts(request, course_id, test_id):
-    context = {'students':[], 'course_id': course_id, 'test_id': test_id}
     test = Test.objects.get(pk=test_id)
+    context = {'students':[], 'course_id': course_id, 'test': test, 'form': TestCloseForm()}
     attempts = Test_Attempt.objects.filter(test=test)
     for student in Student_Profile.objects.filter(group__in=test.course.groups.all()):
         context['students'].append([student, Test_Attempt.objects.filter(Q(test=test) & Q(student=student))])
+    if request.method == 'POST':
+        if 'close_st' in request.POST:
+            # проверка если есть попыт + окно уведомления
+            test.status = 'CLOSED'
+            test.save(update_fields=['status'])
+            return redirect('course-view', course_id)
     return render(request, 'educational/test-attempt-list.html', context)
 
 @login_required(login_url='/login/')
@@ -333,6 +374,7 @@ def update_test(request, course_id, test_id):
     InfoForm = TestInfoForm(instance=test)
     QuestionForm = TestQuestionForm()
     PublishForm = TestPublishForm()
+    DeleteForm = TestDeleteForm()
 
     if request.method == 'POST':
         print(request.POST)
@@ -340,6 +382,9 @@ def update_test(request, course_id, test_id):
             # проверка на кол-во вопросов
             test.status = 'DONE'
             test.save(update_fields=['status'])
+            return redirect('course-view', id=course_id)
+        elif 'delete_st' in request.POST:
+            test.delete()
             return redirect('course-view', id=course_id)
         elif 'question_st' in request.POST:
             question = dict(request.POST)
@@ -371,6 +416,7 @@ def update_test(request, course_id, test_id):
     return render(request, 'educational/test_update.html', context={'q_form': QuestionForm,
                                                                     'info_form': InfoForm,
                                                                     'publish_form': PublishForm,
+                                                                    'delete_form': DeleteForm,
                                                                     'test': test})
 
 @login_required(login_url='/login/')
@@ -402,44 +448,50 @@ def get_test(request, course_id, test_id):
         return redirect('course-view', id=course_id)
     return render(request, 'educational/test_sample.html')
 
-
-
-# @login_required(login_url='/login/')
-# def close_test(request, id):
-#     test = Test.objects.get(pk=id)
-#     with open(test.filepath, encoding='utf-8') as json_file:
-#         test_f = json.load(json_file)
-#     if request.method == 'POST':
-#         res=[]
-#         for st in Student_Profile.objects.filter(group__in=test.course.groups.all()): 
-#             if not Test_Attempt.objects.filter(student=st).filter(test=test):
-#                 test_mark = Test_Mark(test=test, student=st, 
-#                                       points=0, max_points=test_methods.get_test_points(test_f))
-#                 test_mark.save()
-#             else:
-#                 match Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date').last().status:
-#                     case 'ACCESS':
-#                         continue
-#                     case 'DENIED':
-#                         test_mark = Test_Mark(test=test, student=st, 
-#                                       points=0, max_points=test_methods.get_test_points(test_f))
-#                         test_mark.save()
-#                     case 'CHECK':
-#                         ta = Test_Attempt.objects.filter(student=st).filter(test=test).order_by('publish_date').last()
-#                         with open(ta.filepath, 'r', encoding='cp1251') as json_file: # ошибка на стороне записи попытки, исправить
-#                             test_at = json.load(json_file)
-#                         ta.status = 'ACCESS'
-#                         ta.save()
-#                         test_mark = Test_Mark(test=test, test_attempt=ta, 
-#                                   student=st, 
-#                                   points=test_methods.get_test_attempt_points(test_at),
-#                                   max_points=test_methods.get_test_points(test_f))
-#                         test_mark.save()
-#         test.status = 'CLOSED'
-#         test.save()      
-#         return redirect('course-view', id=test.course.pk)
-
-#     return render(request, 'educational/test_close.html', context={'test': test})
+@login_required(login_url='/login/')
+def get_global_gradebook(request, teacher_id):
+    teacher = Teacher_Profile.objects.get(pk=teacher_id)
+    courses = Course.objects.filter(author=teacher)
+    result = []
+    for course in courses:
+        # если нет групп
+        tests = Test.objects.filter(course=course).filter(Q(status='DONE')|Q(status='CLOSED')).order_by('publish_date')
+        tasks = Task.objects.filter(course=course).filter(Q(status='DONE')|Q(status='CLOSED')).order_by('publish_date')
+        course_groups = []
+        for group in course.groups.all():
+            group_list=[]
+            for student in group.student_profile_set.all():
+                student_scores = [student, [], [], [], []]
+                for test in tests:
+                    test_closed = 2
+                    if test.status == 'CLOSED': test_closed = 1
+                    attempts = Test_Attempt.objects.filter(Q(test=test)&Q(student=student))
+                    if attempts:
+                        if attempts.filter(status='ACCESS'):
+                            student_scores[test_closed].append(attempts.get(status='ACCESS'))
+                        elif attempts.filter(status='CHECK'):
+                            student_scores[test_closed].append(attempts.get(status='CHECK'))
+                    else:
+                        student_scores[test_closed].append('no_att')
+                for task in tasks:
+                    task_closed = 4
+                    if task.status == 'CLOSED': task_closed = 3
+                    attempts = Task_Attempt.objects.filter(Q(task=task)&Q(student=student))
+                    if attempts:
+                        if attempts.filter(status='ACCESS'):
+                            student_scores[task_closed].append(attempts.get(status='ACCESS'))
+                        elif attempts.filter(status='CHECK'):
+                            student_scores[task_closed].append(attempts.get(status='CHECK'))
+                    else:
+                        student_scores[task_closed].append('no_att')
+                group_list.append(student_scores)
+            course_groups.append([group, group_list, 
+                                  Test.objects.filter(course=course).filter(status='CLOSED').order_by('publish_date'),
+                                  Test.objects.filter(course=course).filter(status='DONE').order_by('publish_date'),
+                                  Task.objects.filter(course=course).filter(status='CLOSED').order_by('publish_date'),
+                                  Task.objects.filter(course=course).filter(status='DONE').order_by('publish_date')])
+        result.append([course, course_groups])
+    return render(request, 'educational/global_gradebook.html', context={'courses': result})
 
 # @login_required(login_url='/login/')
 # def get_course_gradebook(request, id, group_num):

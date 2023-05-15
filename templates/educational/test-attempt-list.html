@@ -5,24 +5,32 @@
 
     <div class="add-page">
         {% for student in students %}
-            <h5 class="fw-normal mb-1 pb-1" style="letter-spacing: 1px;">{{ student.0.last_name }} {{ student.0.first_name }}</h5>
+            <h5 class="fw-normal mb-1 pb-1" style="letter-spacing: 1px;">{{ student.0.last_name }} {{ student.0.first_name }} группа {{ student.0.group.number }}</h5>
             {% if not student.1 %}
                 <h5 class="mb-4">Тест не был пройден!</h5>
             {% else %}
                 <div class="list-group attempts-list mb-2 mt-2">
                     {% for attempt in student.1 %}
                         {% if attempt.status == 'CHECK' %}
-                            <a href="{% url 'test-attempt-check' course_id test_id attempt.pk %}" class="list-group-item list-group-item-warning mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} </a>
+                            <a href="{% url 'test-attempt-check' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-warning mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} </a>
                         {% elif attempt.status == 'DENIED' %}
-                            <a href="{% url 'test-attempt' course_id test_id attempt.pk %}" class="list-group-item list-group-item-danger mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }}</a>
+                            <a href="{% url 'test-attempt' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-danger mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }}</a>
                         {% elif attempt.status == 'ACCESS' %}
-                            <a href="{% url 'test-attempt' course_id test_id attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} </a>
+                            <a href="{% url 'test-attempt' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} </a>
                         {% endif %}
                         
                     {% endfor %}
                 </div>
             {% endif %}
         {% endfor %}
+        {% if test.status == 'DONE' %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <button class="btn btn-success mt-3" type="submit">Закрыть тест</button>
+            </form>
+        {% endif %}
     </div>
+
 
 {% endblock content %}

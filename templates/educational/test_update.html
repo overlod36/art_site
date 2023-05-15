@@ -15,11 +15,18 @@
                         </div>
                     </div>
                 </form>
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ publish_form }}
-                    <button type="submit" class="btn btn-success mt-1 mb-2">Опубликовать</button>
-                </form>
+                <div class="d-flex">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ publish_form }}
+                        <button type="submit" class="btn btn-success mt-1 mb-2 me-2">Опубликовать</button>
+                    </form>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ delete_form }}
+                        <button type="submit" class="btn btn-danger mt-1 mb-2">Удалить</button>
+                    </form>
+                </div>
                 <h5 class="fw-normal mt-2 mb-1" style="letter-spacing: 1px;">Добавление вопроса</h5>
                 <form method="POST">
                     {% csrf_token %}

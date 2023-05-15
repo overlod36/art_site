@@ -7,6 +7,7 @@ urlpatterns = [
     path('st-galleries/', views.StudentGalleryListView.as_view(), name='student-galleries'),
     path('st-picture/<pk>/delete', views.StudentPictureDeleteView.as_view(), name='st-pic-del'),
     path('st-picture/<pk>/update', views.StudentPictureUpdateView.as_view(), name='st-pic-upd'),
+    path('public-galleries/', views.PublicGalleryListView.as_view(), name='public-galleries'),
     path('public-gallery/<int:id>', views.get_public_gallery, name='public-gallery'),
     path('public-gallery/new', views.create_public_gallery, name='public-gallery-new'),
     path('public-gallery/<int:id>/load', views.load_public_picture, name='pub-pic-load'),

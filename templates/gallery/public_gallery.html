@@ -19,9 +19,10 @@
                     <img class="card-img-top gal-img" src="{{ img.public_img.url }}"/>
                     <div class="card-body img-kunt">
                       <div class="ls-item pt-2">
-                        <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="text-decoration-none link-secondary" href="#">{{ img.title }}</a>
+                        <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="text-decoration-none link-secondary" href="#">{% if img.title %}{{ img.title }}{% else %}Без названия{% endif %}</a>
                       </div>
                       <div class="rs-item">
+                        {% if request.user.teacher_profile == gallery.author %}
                           <a class="text-decoration-none" href="{% url 'public-picture-del' img.pk %}">
                               <button class="button-admin-trash">
                                   <img class="solo-ico" src="{% static 'img/delete-16.png' %}" alt="">
@@ -32,6 +33,7 @@
                                   <img class="solo-ico-2" src="{% static 'img/settings-12-16.png' %}" alt="">
                               </button>
                           </a>
+                        {% endif %}
                       </div>
                     </div>
                   </div>

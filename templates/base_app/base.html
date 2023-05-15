@@ -20,7 +20,8 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <div class="navbar-nav mr-auto">
             <a class="nav-item nav-link" href="{% url 'announces' %}">Объявления</a>
-            <a class="nav-item nav-link" href="{% url 'student-galleries' %}">Галереи</a>
+            <a class="nav-item nav-link" href="{% url 'student-galleries' %}">Студенческие галереи</a>
+            <a class="nav-item nav-link" href="{% url 'public-galleries' %}">Публичные галереи</a>
           </div>
           <div class="right-nav navbar-nav">
             {% if request.user.is_authenticated %}

@@ -46,6 +46,14 @@ class Public_Gallery(Base_Gallery):
             file_methods.create_folder(os.path.join(file_methods.PATH, 'content', 'public_galleries', self.code_name))
         super(Public_Gallery, self).save(*args, **kwargs)
 
+    @property
+    def pictures_count(self):
+        return self.public_picture_set.all().count()
+    
+    @property
+    def cover(self):
+        return self.public_picture_set.latest('publish_date')
+
     def __str__(self):
         return f'Публичная галерея за авторством {self.author.last_name} {self.author.first_name}'
 
