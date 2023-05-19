@@ -50,16 +50,23 @@ class PasswordUpdateView(LoginRequiredMixin, UpdateView):
             return HttpResponse(status=400)
         else:
             self.pk = kwargs['pk']
-            return super(PasswordUpdateView, self).dispatch(request, *args, **kwargs)
+            return super(PasswordUpdateView, self).dispatch(request)
     
-    def get_form_class(self):
-        return modelform_factory(self.object.__class__, fields=self.fields, labels={'password': 'Пароль'})
+    def get_form(self, form_class=None):
+        if form_class is None: form_class = self.get_form_class()
+
+        form = super(PasswordUpdateView, self).get_form(form_class)
+        form.fields['password'].widget.attrs['placeholder'] = 'Пароль'
+        form.fields['password'].label = ''
+        form.fields['password'].widget.attrs['class'] = 'form-control mb-2'
+        return form
+        # return modelform_factory(self.object.__class__, fields=self.fields, labels={'password': 'Пароль'})
 
     def form_valid(self, form):
         user = form.save(commit=False)
         user.password = make_password(form['password'].value())
         user.save()
-        return redirect(self.get_success_url())
+        return super().form_valid(form)
     
 class LoginUpdateView(LoginRequiredMixin, UpdateView):
     model = User

@@ -156,9 +156,11 @@
                     {% if request.user.student_profile %}
                         <div class="course-section-title"><h3>Доступные тесты</h3></div>
                         {% for test in tests %}
-                            {% if test.status == 'DONE' %}
-                                <a href="{% url 'test' course.pk test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.title }}</a>
-                            {% endif %}
+                            <div class="course-material">
+                                {% if test.status == 'DONE' %}
+                                    <a href="{% url 'test' course.pk test.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> {{ test.title }}</a>
+                                {% endif %}
+                            </div>
                         {% endfor %}
                     {% elif request.user.teacher_profile %}
                         <div class="course-section-title"><h3>Доступные тесты</h3></div>

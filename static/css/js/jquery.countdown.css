@@ -2,8 +2,7 @@
 .is-countdown {
 	width: 190px;
 	height: 75px;
-	border: 1px solid #ccc;
-	background-color: #eee;
+
 }
 .countdown-rtl {
 	direction: rtl;

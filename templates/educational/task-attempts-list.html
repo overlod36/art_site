@@ -12,11 +12,11 @@
                 <div class="list-group attempts-list mb-2 mt-2">
                     {% for attempt in student.1 %}
                         {% if attempt.status == 'CHECK' %}
-                            <a href="{% url 'task-attempt-check' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-warning mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }} </a>
+                            <a href="{% url 'task-attempt-check' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-warning mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }}</a>
                         {% elif attempt.status == 'DENIED' %}
                             <a href="{% url 'task-attempt' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-danger mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }}</a>
                         {% elif attempt.status == 'ACCESS' %}
-                            <a href="{% url 'task-attempt' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }} </a>
+                            <a href="{% url 'task-attempt' attempt.task.course.pk attempt.task.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.publish_date|format }} {{ attempt.mark }}/{{ attempt.task.mark }}</a>
                         {% endif %}
                     {% endfor %}
                 </div>

@@ -3,11 +3,13 @@
 {% load static %}
 {% block content %}
     <div class="add-page">
-        <h4 class="fw-normal mb-4 pb-1" style="letter-spacing: 1px;">Файлы</h4>
+        <h4 class="fw-normal mb-5 pb-1" style="letter-spacing: 1px;">Прикрепленные файлы</h4>
         {% for file in files %}
-            <a href="{% url 'task-attempt-file' c_id task_id a_id file.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> 
-                {{ file.filename }} 
-            </a>
+            <div class="list-group mb-2 mt-2">
+                <a class="list-group-item" href="{% url 'task-attempt-file' c_id task_id a_id file.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> 
+                    {{ file.filename }} 
+                </a>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}

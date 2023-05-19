@@ -16,7 +16,7 @@
                         {% elif attempt.status == 'DENIED' %}
                             <a href="{% url 'test-attempt' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-danger mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }}</a>
                         {% elif attempt.status == 'ACCESS' %}
-                            <a href="{% url 'test-attempt' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} </a>
+                            <a href="{% url 'test-attempt' course_id test.pk attempt.pk %}" class="list-group-item list-group-item-success mb-0 text-center">Попытка №{{ forloop.counter }} {{ attempt.date_of_attempt|format }} {{ attempt.mark }}/{{ attempt.test.mark }} </a>
                         {% endif %}
                         
                     {% endfor %}

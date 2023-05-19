@@ -22,6 +22,8 @@ class TestShowForm(Form):
                                                                     choices=choices, widget=forms.RadioSelect)
             elif question.test_answer_set.all().count() == 1:
                 self.fields[f'{question.pk}'] = forms.CharField(label=f'{question.text} ({question.mark} баллов)', widget=forms.Textarea)
+                self.fields[f'{question.pk}'].widget.attrs['class'] = 'form-control mb-2 mt-2'
+            
 
 class TestAttemptCheckForm(Form):
     def __init__(self, attempt, *args, **kwargs):

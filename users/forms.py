@@ -4,6 +4,14 @@ from django.contrib.auth.models import User
 from betterforms.multiform import MultiModelForm
 
 class StudyGroupForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(StudyGroupForm, self).__init__(*args, **kwargs)
+        self.fields['number'].label = ''
+        self.fields['number'].widget.attrs['placeholder'] = 'Номер группы'
+        self.fields['number'].widget.attrs['class'] = 'form-control mb-4'
+        
+
     class Meta:
         model = Study_Group
         fields = ['number']
