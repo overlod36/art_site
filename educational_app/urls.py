@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('course/new/', views.CourseCreateView.as_view(), name='course-create'),
     path('course/<int:id>', views.get_course, name='course-view'),
+    path('student-gradebook/<int:student_id>/', views.get_student_gradebook, name='student-gradebook'),
     path('gradebook/<int:teacher_id>/global', views.get_global_gradebook, name='global_gradebook'),
     # path('course/<int:id>/gradebook/<int:group_num>', views.get_course_gradebook, name='course-gradebook'),
     path('lecture/<int:id>', views.get_lecture, name='download-lec'),
@@ -28,7 +29,4 @@ urlpatterns = [
     path('course/<int:course_id>/task/<int:task_id>/attempts/<int:attempt_id>/check', views.check_task_attempt, name='task-attempt-check'),
     path('course/<int:course_id>/task/<int:task_id>/attempts/<int:attempt_id>/file/<int:file_id>', views.get_task_attempt_file, name='task-attempt-file'),
     path('course/<int:course_id>/task/<int:task_id>/solution', views.send_task_attempt, name='task-attempt-create'),
-    # path('test/<int:id>', views.get_test, name='test'),
-    # path('test-attempt/<int:id>', views.get_test_attempt, name='test-attempt'),
-    # path('test/<int:id>/close', views.close_test, name='test-close')
 ]

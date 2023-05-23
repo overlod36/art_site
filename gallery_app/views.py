@@ -28,6 +28,15 @@ class StudentGalleryListView(LoginRequiredMixin, ListView):
     def get_queryset(self) -> QuerySet[Any]:
         return Student_Gallery.objects.filter(Q(status='INNER') | Q(status='PUBLIC')).order_by('student__last_name')
 
+class PublicStudentGalleryListView(ListView):
+    model = Student_Gallery
+    template_name = 'gallery/student_galleries_list.html'
+    context_object_name = 'st_galleries'
+    paginate_by = 3
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return Student_Gallery.objects.filter(status='PUBLIC').order_by('student__last_name')
+
 class PublicGalleryListView(LoginRequiredMixin, ListView):
     model = Public_Gallery
     template_name = 'gallery/public_galleries_list.html'
@@ -152,7 +161,7 @@ class PublicPictureDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse('main')
 
-@login_required(login_url='/login/')
+# @login_required(login_url='/login/')
 def get_student_gallery(request, id):
     page = request.GET.get('page', 1)
     gallery = Student_Gallery.objects.get(pk=id)

@@ -9,6 +9,13 @@
                 <a class="list-group-item" href="{% url 'task-attempt-file' c_id task_id a_id file.pk %}"> <img class="use-ico" src="{% static 'img/file-32.png' %}" alt=""> 
                     {{ file.filename }} 
                 </a>
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="fw-normal mt-1 mb-5" style="letter-spacing: 1px;">Комментарий</h5>
+                        <p>{{ comment }}</p>
+                    </div>
+                </div>
+                
             </div>
         {% endfor %}
     </div>

@@ -16,8 +16,8 @@ from users.models import Teacher_Profile, Student_Profile, Study_Group
 from .decorators import check_course_existence, course_access, check_test_existence
 from .forms import (TestForm, TaskForm, TestShowForm, 
                     TestAttemptCheckForm, AttemptDeniedForm, TestInfoForm, 
-                    TestQuestionForm, TestPublishForm, TestAttemptFilesForm, 
-                    TaskAttemptAcceptForm, TestDeleteForm, TestCloseForm)
+                    TestQuestionForm, TestPublishForm, TaskAttemptFilesForm, 
+                    TaskAttemptAcceptForm, TestDeleteForm, TestCloseForm, TaskAttemptDeniedForm)
 from django.http import HttpRequest
 from django.shortcuts import redirect
 import json
@@ -217,13 +217,14 @@ def get_task_attempt(request, course_id, task_id, attempt_id):
     return render(request, 'educational/task_attempt.html', context={'files': files,
                                                                      'c_id': course_id,
                                                                      'task_id': task_id,
-                                                                     'a_id': attempt_id})
+                                                                     'a_id': attempt_id,
+                                                                     'comment': attempt.comment})
                                                                            
 @login_required(login_url='/login/')
 def send_task_attempt(request, course_id, task_id):
-    if Task_Attempt.objects.filter(student=request.user.student_profile).filter(Q(status='CHECK')|Q(status='ACCESS')):
+    if Task_Attempt.objects.filter(Q(student=request.user.student_profile)&Q(task=Task.objects.get(pk=task_id))).filter(Q(status='CHECK')|Q(status='ACCESS')):
         return redirect('course-view', course_id)
-    form = TestAttemptFilesForm()
+    form = TaskAttemptFilesForm()
     task = Task.objects.get(pk=task_id)
     if request.method == 'POST':
         attempt = Task_Attempt(task=task, 
@@ -251,18 +252,20 @@ def get_task_attempt_file(request, course_id, task_id, attempt_id, file_id):
 def check_task_attempt(request, course_id, task_id, attempt_id):
     attempt = Task_Attempt.objects.get(pk=attempt_id)
     files = attempt.task_attempt_file_set.all()
-    denied = AttemptDeniedForm()
+    denied = TaskAttemptDeniedForm()
     accept = TaskAttemptAcceptForm(attempt.task.mark)
 
     if request.method == 'POST':
         if 'denied_st' in request.POST:
             attempt.status = 'DENIED'
-            attempt.save(update_fields=['status'])
+            attempt.comment = request.POST['comment']
+            attempt.save(update_fields=['status', 'comment'])
         elif 'accepted_st' in request.POST:
             res = request.POST
             attempt.status = 'ACCESS'
             attempt.mark = int(res['mark'][0])
-            attempt.save(update_fields=['status', 'mark'])
+            attempt.comment = res['comment']
+            attempt.save(update_fields=['status', 'mark', 'comment'])
         return redirect('task-attempts', course_id, task_id)
 
     return render(request, 'educational/task_attempt_check.html', context={'denied':denied,
@@ -449,6 +452,50 @@ def get_test(request, course_id, test_id):
     return render(request, 'educational/test_sample.html')
 
 @login_required(login_url='/login/')
+def get_student_gradebook(request, student_id):
+    # проверка на препода или конкретного ученика 
+    student = Student_Profile.objects.get(pk=student_id)
+    courses = Course.objects.filter(groups=student.group)
+    result = []
+    for course in courses:
+        st_tests = []
+        st_tasks = []
+        tests = Test.objects.filter(course=course).filter(Q(status='DONE')|Q(status='CLOSED')).order_by('publish_date')
+        tasks = Task.objects.filter(course=course).filter(Q(status='DONE')|Q(status='CLOSED')).order_by('publish_date')
+        for test in tests:
+            attempts = Test_Attempt.objects.filter(Q(test=test)&Q(student=student))
+            if attempts:
+                if attempts.filter(status='ACCESS'):
+                    st_tests.append([test, attempts.get(status='ACCESS')])
+                elif attempts.filter(status='CHECK'):
+                    st_tests.append([test, 'check'])
+                else:
+                    st_tests.append([test, 'to_solve'])
+            else:
+                if test.status == 'CLOSED':
+                    st_tests.append([test, 'skipped'])
+                else:
+                    st_tests.append([test, 'to_solve'])
+        for task in tasks:
+            attempts = Task_Attempt.objects.filter(Q(task=task)&Q(student=student))
+            if attempts:
+                if attempts.filter(status='ACCESS'):
+                    st_tasks.append([task, attempts.get(status='ACCESS')])
+                elif attempts.filter(status='CHECK'):
+                    st_tasks.append([task, 'check'])
+                else:
+                    st_tasks.append([task, 'to_solve'])
+            else:
+                if task.status == 'CLOSED':
+                    st_tasks.append([task, 'skipped'])
+                else:
+                    st_tasks.append([task, 'to_solve'])
+        result.append([course, st_tests, st_tasks])
+    return render(request, 'educational/student_gradebook.html', context={'courses': result})
+
+
+
+@login_required(login_url='/login/')
 def get_global_gradebook(request, teacher_id):
     teacher = Teacher_Profile.objects.get(pk=teacher_id)
     courses = Course.objects.filter(author=teacher)
@@ -493,15 +540,3 @@ def get_global_gradebook(request, teacher_id):
         result.append([course, course_groups])
     return render(request, 'educational/global_gradebook.html', context={'courses': result})
 
-# @login_required(login_url='/login/')
-# def get_course_gradebook(request, id, group_num):
-#     group = Study_Group.objects.get(number=group_num)
-#     # проверка
-#     context = {'id': id, 'group': group}
-#     context['tests'] = Test.objects.filter(status='CLOSED').order_by('publish_date')
-#     context['students'] = [[student, 
-#                             Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date'),
-#                             Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'],
-#                             Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum'],
-#                             "%.1f" % ((Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('points'))['points__sum'] / Test_Mark.objects.filter(student=student).order_by('test_attempt__test__publish_date').aggregate(Sum('max_points'))['max_points__sum']) * 100)] for student in group.ordered_students]
-#     return render(request, 'educational/group_course_points.html', context)

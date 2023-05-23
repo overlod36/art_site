@@ -69,6 +69,7 @@ class Task_Attempt(models.Model):
     task = models.ForeignKey(Task, verbose_name='Задание', on_delete=models.CASCADE)
     student = models.ForeignKey(Student_Profile, verbose_name='Студент', on_delete=models.CASCADE)
     status = models.CharField(verbose_name="Статус решения задания", max_length=50, choices=TASK_ATTEMPT_STATUS)
+    comment = models.TextField()
     publish_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата выполнения задания')
     mark = models.PositiveIntegerField()
 

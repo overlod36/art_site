@@ -1,0 +1,43 @@
+{% extends "base_app/base.html" %}
+{% load static %}
+{% block content %}
+    <div class="add-page">
+        <div class="row row-cols-2">
+            {% for course in courses %}
+                <div class="ann-container card w-50 col m-2">
+                    <div class="card-body">
+                        <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">{{ course.0.title }}</h3>
+                        <h5 class="fw-normal mb-1 mx-3" style="letter-spacing: 1px;">Тесты</h5>
+                        <ul class="list-group rounded profile-act">
+                            {% for test in course.1 %}
+                                {% if test.1 == 'check' %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{test.0.title}}</a> <a>на проверке!</a></li>
+                                {% elif test.1 == 'skipped' %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{test.0.title}}</a> <a>просрочен!</a></li>
+                                {% elif test.1 == 'to_solve'%}
+                                    <li class="list-group-item w-50"><a class="fw-bold" href="{% url 'test' course.0.pk test.0.pk %}">{{test.0.title}}</a></li>
+                                {% else %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{test.0.title}}</a> <a href="{% url 'test-attempt' course.0.pk test.0.pk test.1.pk %}">{{test.1.mark}}/{{test.0.mark}} </a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <h5 class="fw-normal mb-1 mx-3" style="letter-spacing: 1px;">Задания</h5>
+                        <ul class="list-group rounded profile-act">
+                            {% for task in course.2 %}
+                                {% if task.1 == 'check' %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{task.0.title}}</a> <a>на проверке!</a></li>
+                                {% elif task.1 == 'skipped' %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{task.0.title}}</a> <a>просрочен!</a></li>
+                                {% elif task.1 == 'to_solve'%}
+                                    <li class="list-group-item w-50"><a class="fw-bold" href="{% url 'task-attempt-create' course.0.pk task.0.pk %}">{{task.0.title}}</a></li>
+                                {% else %}
+                                    <li class="list-group-item w-50"><a class="fw-bold text-decoration-none text-black">{{task.0.title}}</a> <a href="{% url 'task-attempt' course.0.pk task.0.pk task.1.pk %}">{{task.1.mark}}/{{task.0.mark}} </a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

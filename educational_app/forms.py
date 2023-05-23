@@ -99,6 +99,7 @@ class TaskForm(ModelForm):
 class TaskAttemptAcceptForm(Form):
     accepted_st = forms.CharField(widget=forms.HiddenInput)
     mark = forms.IntegerField(label='')
+    comment = forms.CharField(widget=forms.Textarea(attrs={"rows":"5"}))
 
     def __init__(self, points, *args, **kwargs):
         super(TaskAttemptAcceptForm, self).__init__(*args, **kwargs)
@@ -107,8 +108,21 @@ class TaskAttemptAcceptForm(Form):
         self.fields['mark'].widget.attrs['max'] = str(points)
         self.fields['mark'].widget.attrs['class'] = 'form-control mt-5 mb-2 at-mark-input'
         self.fields['mark'].label = ''
+        self.fields['comment'].widget.attrs['class'] = 'form-control mt-2 mb-2 at-mark-input'
+        self.fields['comment'].label = ''
+        self.fields['comment'].widget.attrs['placeholder'] = 'Комментарий'
 
-class TestAttemptFilesForm(forms.Form):
+class TaskAttemptDeniedForm(Form):
+    denied_st = forms.CharField(widget=forms.HiddenInput)
+    comment = forms.CharField(widget=forms.Textarea(attrs={"rows":"5"}))
+
+    def __init__(self, *args, **kwargs):
+        super(TaskAttemptDeniedForm, self).__init__(*args, **kwargs)
+        self.fields['comment'].widget.attrs['class'] = 'form-control mt-2 mb-2 at-mark-input'
+        self.fields['comment'].label = ''
+        self.fields['comment'].widget.attrs['placeholder'] = 'Комментарий'
+
+class TaskAttemptFilesForm(forms.Form):
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control mb-4'}), label='')
 
 class TestQuestionForm(Form):

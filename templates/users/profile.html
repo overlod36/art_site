@@ -21,7 +21,7 @@
             {% if request.user.student_profile %}
                 <ul class="list-group rounded profile-act">
                     <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'student-gallery' id=request.user.student_profile.student_gallery.pk %}"><img class="use-ico" src="{% static 'img/photo-24.png' %}" alt="">Галерея</a></li>
-                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="#"><img class="use-ico" src="{% static 'img/newspaper-10-24.png' %}" alt="">Оценки</a></li>
+                    <li class="list-group-item"><a class="nav-item nav-link text-secondary st-gal" href="{% url 'student-gradebook' student_id=request.user.student_profile.pk %}"><img class="use-ico" src="{% static 'img/newspaper-10-24.png' %}" alt="">Оценки</a></li>
                 </ul>
             {% elif request.user.teacher_profile %}
                 <ul class="list-group rounded profile-act">
